@@ -128,45 +128,45 @@ export default function Navigation() {
           
           {/* Floating Menu */}
           <div className="fixed right-2 top-16 md:hidden z-50">
-            <div className="bg-slate-800/95 backdrop-blur-xl border border-slate-700 rounded-lg shadow-2xl min-w-[160px]">
+            <div className="bg-slate-800/95 backdrop-blur-xl border border-slate-700 rounded-lg shadow-2xl min-w-[140px]">
               {/* Menu Items */}
-              <div className="py-1">
+              <div className="py-0.5">
                 <Link 
                   href="/personal" 
                   onClick={closeMenu}
-                  className="flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
+                  className="flex items-center space-x-2 px-2 py-1 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
                 >
-                  <span className="text-sm">👤</span>
+                  <span>👤</span>
                   <span>Personal</span>
                 </Link>
                 <Link 
                   href="/website" 
                   onClick={closeMenu}
-                  className="flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
+                  className="flex items-center space-x-2 px-2 py-1 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
                 >
-                  <span className="text-sm">🌐</span>
+                  <span>🌐</span>
                   <span>Website</span>
                 </Link>
                 <Link 
                   href="/pricing" 
                   onClick={closeMenu}
-                  className="flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
+                  className="flex items-center space-x-2 px-2 py-1 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
                 >
-                  <span className="text-sm">💰</span>
+                  <span>💰</span>
                   <span>Pricing</span>
                 </Link>
                 <Link 
                   href="/blog" 
                   onClick={closeMenu}
-                  className="flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
+                  className="flex items-center space-x-2 px-2 py-1 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
                 >
-                  <span className="text-sm">📝</span>
+                  <span>📝</span>
                   <span>Blog</span>
                 </Link>
               </div>
 
               {/* CTA Section */}
-              <div className="border-t border-slate-700 py-1 px-1 space-y-0.5">
+              <div className="border-t border-slate-700 py-0.5 px-0.5 space-y-0.5">
                 <Link 
                   href="/personal"
                   onClick={closeMenu}
