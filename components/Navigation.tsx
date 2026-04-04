@@ -1,28 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
 
 export default function Navigation() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  // Close menu on escape key
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMobileMenuOpen(false);
-    };
-    if (mobileMenuOpen) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
-    }
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
-    };
-  }, [mobileMenuOpen]);
-
-  const closeMenu = () => setMobileMenuOpen(false);
-
   return (
     <>
       <nav className="bg-slate-900/80 backdrop-blur-md border-b border-slate-700 sticky top-0 z-40">
@@ -95,99 +75,70 @@ export default function Navigation() {
               </Link>
             </div>
 
-            {/* Mobile menu button */}
-            <div className="md:hidden flex items-center">
+            {/* Mobile menu button with hover dropdown */}
+            <div className="md:hidden flex items-center relative group">
               <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="text-slate-300 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-colors"
-                aria-label="Toggle menu"
+                aria-label="Menu"
               >
-                {mobileMenuOpen ? (
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                ) : (
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
-                )}
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
               </button>
+              
+              {/* Floating Dropdown Menu on Hover */}
+              <div className="absolute right-0 top-full mt-1 w-40 bg-slate-800/95 backdrop-blur-xl rounded-lg shadow-2xl border border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <div className="py-1">
+                  <Link 
+                    href="/personal" 
+                    className="flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
+                  >
+                    <span>👤</span>
+                    <span>Personal</span>
+                  </Link>
+                  <Link 
+                    href="/website" 
+                    className="flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
+                  >
+                    <span>🌐</span>
+                    <span>Website</span>
+                  </Link>
+                  <Link 
+                    href="/pricing" 
+                    className="flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
+                  >
+                    <span>💰</span>
+                    <span>Pricing</span>
+                  </Link>
+                  <Link 
+                    href="/blog" 
+                    className="flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
+                  >
+                    <span>📝</span>
+                    <span>Blog</span>
+                  </Link>
+                </div>
+                <div className="border-t border-slate-700 py-1 px-1 space-y-0.5">
+                  <Link 
+                    href="/personal"
+                    className="flex items-center justify-center space-x-1 w-full bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded font-medium transition-colors text-xs"
+                  >
+                    <span>👤</span>
+                    <span>Scan</span>
+                  </Link>
+                  <Link 
+                    href="/website"
+                    className="flex items-center justify-center space-x-1 w-full bg-purple-600 hover:bg-purple-700 text-white py-1 px-2 rounded font-medium transition-colors text-xs"
+                  >
+                    <span>🌐</span>
+                    <span>Audit</span>
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </nav>
-
-      {/* Floating Mobile Menu Overlay */}
-      {mobileMenuOpen && (
-        <>
-          {/* Backdrop */}
-          <div 
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
-            onClick={closeMenu}
-          />
-          
-          {/* Floating Menu */}
-          <div className="fixed right-2 top-16 md:hidden z-50">
-            <div className="bg-slate-800/95 backdrop-blur-xl border border-slate-700 rounded-lg shadow-2xl min-w-[140px]">
-              {/* Menu Items */}
-              <div className="py-0.5">
-                <Link 
-                  href="/personal" 
-                  onClick={closeMenu}
-                  className="flex items-center space-x-2 px-2 py-1 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
-                >
-                  <span>👤</span>
-                  <span>Personal</span>
-                </Link>
-                <Link 
-                  href="/website" 
-                  onClick={closeMenu}
-                  className="flex items-center space-x-2 px-2 py-1 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
-                >
-                  <span>🌐</span>
-                  <span>Website</span>
-                </Link>
-                <Link 
-                  href="/pricing" 
-                  onClick={closeMenu}
-                  className="flex items-center space-x-2 px-2 py-1 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
-                >
-                  <span>💰</span>
-                  <span>Pricing</span>
-                </Link>
-                <Link 
-                  href="/blog" 
-                  onClick={closeMenu}
-                  className="flex items-center space-x-2 px-2 py-1 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
-                >
-                  <span>📝</span>
-                  <span>Blog</span>
-                </Link>
-              </div>
-
-              {/* CTA Section */}
-              <div className="border-t border-slate-700 py-0.5 px-0.5 space-y-0.5">
-                <Link 
-                  href="/personal"
-                  onClick={closeMenu}
-                  className="flex items-center justify-center space-x-1 w-full bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded font-medium transition-colors text-xs"
-                >
-                  <span>👤</span>
-                  <span>Scan</span>
-                </Link>
-                <Link 
-                  href="/website"
-                  onClick={closeMenu}
-                  className="flex items-center justify-center space-x-1 w-full bg-purple-600 hover:bg-purple-700 text-white py-1 px-2 rounded font-medium transition-colors text-xs"
-                >
-                  <span>🌐</span>
-                  <span>Audit</span>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
     </>
   );
 }
