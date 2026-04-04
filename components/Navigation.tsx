@@ -86,49 +86,47 @@ export default function Navigation() {
                 </svg>
               </button>
               
-              {/* Floating Dropdown Menu on Hover */}
-              <div className="absolute right-0 top-full mt-1 w-40 bg-slate-800/95 backdrop-blur-xl rounded-lg shadow-2xl border border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                <div className="py-1">
-                  <Link 
-                    href="/personal" 
-                    className="flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
-                  >
-                    <span>👤</span>
-                    <span>Personal</span>
-                  </Link>
-                  <Link 
-                    href="/website" 
-                    className="flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
-                  >
-                    <span>🌐</span>
-                    <span>Website</span>
-                  </Link>
-                  <Link 
-                    href="/pricing" 
-                    className="flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
-                  >
-                    <span>💰</span>
-                    <span>Pricing</span>
-                  </Link>
-                  <Link 
-                    href="/blog" 
-                    className="flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
-                  >
-                    <span>📝</span>
-                    <span>Blog</span>
-                  </Link>
-                </div>
-                <div className="border-t border-slate-700 py-1 px-1 space-y-0.5">
+              {/* Floating Menu Items on Hover */}
+              <div className="absolute right-0 top-full mt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <Link 
+                  href="/personal" 
+                  className="flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700/80 backdrop-blur-sm rounded-md transition-colors mb-0.5"
+                >
+                  <span>👤</span>
+                  <span>Personal</span>
+                </Link>
+                <Link 
+                  href="/website" 
+                  className="flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700/80 backdrop-blur-sm rounded-md transition-colors mb-0.5"
+                >
+                  <span>🌐</span>
+                  <span>Website</span>
+                </Link>
+                <Link 
+                  href="/pricing" 
+                  className="flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700/80 backdrop-blur-sm rounded-md transition-colors mb-0.5"
+                >
+                  <span>💰</span>
+                  <span>Pricing</span>
+                </Link>
+                <Link 
+                  href="/blog" 
+                  className="flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700/80 backdrop-blur-sm rounded-md transition-colors mb-0.5"
+                >
+                  <span>📝</span>
+                  <span>Blog</span>
+                </Link>
+                <div className="mt-1 space-y-0.5">
                   <Link 
                     href="/personal"
-                    className="flex items-center justify-center space-x-1 w-full bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded font-medium transition-colors text-xs"
+                    className="flex items-center justify-center space-x-1 w-24 bg-blue-600/90 hover:bg-blue-700 text-white py-1 px-2 rounded font-medium transition-colors text-xs backdrop-blur-sm"
                   >
                     <span>👤</span>
                     <span>Scan</span>
                   </Link>
                   <Link 
                     href="/website"
-                    className="flex items-center justify-center space-x-1 w-full bg-purple-600 hover:bg-purple-700 text-white py-1 px-2 rounded font-medium transition-colors text-xs"
+                    className="flex items-center justify-center space-x-1 w-24 bg-purple-600/90 hover:bg-purple-700 text-white py-1 px-2 rounded font-medium transition-colors text-xs backdrop-blur-sm"
                   >
                     <span>🌐</span>
                     <span>Audit</span>
