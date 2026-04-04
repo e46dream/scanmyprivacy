@@ -604,3 +604,34 @@ NOTES: |
     bash backup.sh restore 912f3c3
 
 #===============================================================================
+
+#===============================================================================
+# BACKUP-017: Fixed build error - removed metadata from client components
+#===============================================================================
+ID: BACKUP-017
+TIMESTAMP: 2026-04-04 12:44:31
+GIT_HASH: d2fb445
+AUTHOR: ScanMyPrivacy Developer
+TAGS: ENHANCEMENT
+
+CHANGES:
+  [ADDED] Fixed build error - removed metadata from client components
+  
+FILES_AFFECTED: 3 files
+    - BACKUP_LOG.db
+  - app/personal/page.tsx
+  - app/website/page.tsx
+
+RESTORE_CMD: git reset --hard d2fb445
+
+STATUS: ACTIVE
+
+NOTES: |
+  Backup created at 2026-04-04 12:44:31
+  Commit hash: d2fb445
+  Files changed: 3
+  
+  TO RESTORE:
+    bash backup.sh restore d2fb445
+
+#===============================================================================
