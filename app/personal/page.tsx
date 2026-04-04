@@ -1,23 +1,8 @@
 'use client';
 
-import type { Metadata } from 'next';
 import Navigation from '@/components/Navigation';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-
-export const metadata: Metadata = {
-  title: 'Personal Privacy Scanner - Free IP Leak, DNS & Fingerprint Test',
-  description: 'Free personal privacy scanner. Check for IP leaks, DNS leaks, WebRTC leaks, and browser fingerprinting. Protect your online privacy in less than 60 seconds.',
-  keywords: ['IP leak test', 'DNS leak test', 'WebRTC leak', 'browser fingerprinting', 'privacy scanner', 'VPN test', 'online privacy check', 'free privacy tools'],
-  alternates: {
-    canonical: 'https://scanmyprivacy.com/personal',
-  },
-  openGraph: {
-    title: 'Personal Privacy Scanner - Free Online Privacy Check',
-    description: 'Check for IP leaks, DNS leaks, and browser fingerprinting. Free privacy scanner.',
-    url: 'https://scanmyprivacy.com/personal',
-  },
-};
 
 export default function PersonalPage() {
   const [ipData, setIpData] = useState<any>(null);
