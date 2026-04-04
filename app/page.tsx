@@ -44,7 +44,7 @@ export default function Home() {
               <div className="text-4xl mb-4">🌐</div>
               <h2 className="text-2xl font-bold mb-3">Protect Your Users</h2>
               <p className="text-slate-400 mb-6">
-                Audit your website for GDPR/CCPA compliance. Avoid fines up to €20M.
+                Audit your website for GDPR/CCPA compliance. Avoid fines up to $20M.
               </p>
               <Link 
                 href="/website"

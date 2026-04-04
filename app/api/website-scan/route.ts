@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
       issues.push({
         severity: 'critical',
         title: 'Cookie consent banner missing',
-        description: 'Required for GDPR compliance - €20M fine risk'
+        description: 'Required for GDPR compliance - $20M fine risk'
       });
     }
     
