@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+
+# Allow all search engines to index everything
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+# Sitemap location
+Sitemap: https://scanmyprivacy.com/sitemap.xml
+
+# Crawl rate
+Crawl-delay: 1

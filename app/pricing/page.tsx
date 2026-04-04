@@ -1,5 +1,20 @@
+import type { Metadata } from 'next';
 import Navigation from '@/components/Navigation';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Pricing - Free Personal Scanner & Paid Website Compliance Reports',
+  description: 'ScanMyPrivacy pricing. Personal privacy scanner is 100% free. Website compliance reports from $49. Monthly monitoring from $49/month. GDPR & CCPA compliance made affordable.',
+  keywords: ['privacy scanner pricing', 'GDPR compliance cost', 'CCPA audit price', 'website compliance pricing', 'free privacy tools', 'compliance reports'],
+  alternates: {
+    canonical: 'https://scanmyprivacy.com/pricing',
+  },
+  openGraph: {
+    title: 'ScanMyPrivacy Pricing - Free & Paid Plans',
+    description: 'Free personal privacy scanner. Website compliance reports from $49. Monthly monitoring available.',
+    url: 'https://scanmyprivacy.com/pricing',
+  },
+};
 
 export default function PricingPage() {
   return (

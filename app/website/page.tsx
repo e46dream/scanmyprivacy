@@ -1,8 +1,23 @@
 'use client';
 
+import type { Metadata } from 'next';
 import Navigation from '@/components/Navigation';
 import Link from 'next/link';
 import { useState } from 'react';
+
+export const metadata: Metadata = {
+  title: 'Website Compliance Scanner - GDPR & CCPA Audit Tool',
+  description: 'Free website compliance scanner. Audit your website for GDPR and CCPA violations. Check cookie consent, privacy policies, and avoid $20M fines. Detailed reports from $49.',
+  keywords: ['GDPR compliance checker', 'CCPA compliance', 'website audit', 'cookie consent check', 'privacy policy audit', 'GDPR fine', 'compliance scanner', 'website compliance tool'],
+  alternates: {
+    canonical: 'https://scanmyprivacy.com/website',
+  },
+  openGraph: {
+    title: 'Website Compliance Scanner - GDPR & CCPA Audit',
+    description: 'Audit your website for GDPR and CCPA compliance. Free scan, detailed reports from $49.',
+    url: 'https://scanmyprivacy.com/website',
+  },
+};
 
 export default function WebsitePage() {
   const [url, setUrl] = useState('');
