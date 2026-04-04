@@ -386,3 +386,33 @@ NOTES: |
     bash backup.sh restore 1940683
 
 #===============================================================================
+
+#===============================================================================
+# BACKUP-010: Fixed subtitle punctuation - restored bullets
+#===============================================================================
+ID: BACKUP-010
+TIMESTAMP: 2026-04-04 11:11:57
+GIT_HASH: 2ca08c4
+AUTHOR: ScanMyPrivacy Developer
+TAGS: ENHANCEMENT
+
+CHANGES:
+  [ADDED] Fixed subtitle punctuation - restored bullets
+  
+FILES_AFFECTED: 2 files
+    - BACKUP_LOG.db
+  - app/page.tsx
+
+RESTORE_CMD: git reset --hard 2ca08c4
+
+STATUS: ACTIVE
+
+NOTES: |
+  Backup created at 2026-04-04 11:11:57
+  Commit hash: 2ca08c4
+  Files changed: 2
+  
+  TO RESTORE:
+    bash backup.sh restore 2ca08c4
+
+#===============================================================================
