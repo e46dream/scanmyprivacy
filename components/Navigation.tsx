@@ -127,83 +127,61 @@ export default function Navigation() {
           />
           
           {/* Floating Menu */}
-          <div className="fixed inset-x-4 top-20 bottom-4 md:hidden z-50 pointer-events-none">
-            <div className="bg-slate-800/95 backdrop-blur-xl border border-slate-700 rounded-2xl shadow-2xl pointer-events-auto max-h-full overflow-y-auto">
-              {/* Menu Header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700">
-                <span className="text-lg font-semibold text-white">Menu</span>
-                <button
-                  onClick={closeMenu}
-                  className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-700 transition-colors"
-                  aria-label="Close menu"
-                >
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-
+          <div className="fixed inset-x-4 top-20 md:hidden z-50 pointer-events-none">
+            <div className="bg-slate-800/95 backdrop-blur-xl border border-slate-700 rounded-xl shadow-2xl pointer-events-auto max-w-sm mx-auto">
               {/* Menu Items */}
-              <div className="p-2 space-y-1">
+              <div className="p-1.5">
                 <Link 
                   href="/personal" 
                   onClick={closeMenu}
-                  className="flex items-center space-x-3 px-4 py-3 text-base font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded-xl transition-colors"
+                  className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
                 >
-                  <span className="text-xl">👤</span>
-                  <span>Personal Privacy Scan</span>
+                  <span>👤</span>
+                  <span>Personal Scan</span>
                 </Link>
                 <Link 
                   href="/website" 
                   onClick={closeMenu}
-                  className="flex items-center space-x-3 px-4 py-3 text-base font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded-xl transition-colors"
+                  className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
                 >
-                  <span className="text-xl">🌐</span>
-                  <span>Website Compliance</span>
+                  <span>🌐</span>
+                  <span>Website Scan</span>
                 </Link>
                 <Link 
                   href="/pricing" 
                   onClick={closeMenu}
-                  className="flex items-center space-x-3 px-4 py-3 text-base font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded-xl transition-colors"
+                  className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
                 >
-                  <span className="text-xl">💰</span>
+                  <span>💰</span>
                   <span>Pricing</span>
                 </Link>
                 <Link 
                   href="/blog" 
                   onClick={closeMenu}
-                  className="flex items-center space-x-3 px-4 py-3 text-base font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded-xl transition-colors"
+                  className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
                 >
-                  <span className="text-xl">📝</span>
+                  <span>📝</span>
                   <span>Blog</span>
-                </Link>
-                <Link 
-                  href="/tools" 
-                  onClick={closeMenu}
-                  className="flex items-center space-x-3 px-4 py-3 text-base font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded-xl transition-colors"
-                >
-                  <span className="text-xl">🛠️</span>
-                  <span>Tools</span>
                 </Link>
               </div>
 
               {/* CTA Section */}
-              <div className="p-4 border-t border-slate-700 space-y-2">
+              <div className="px-1.5 pb-1.5 space-y-1">
                 <Link 
                   href="/personal"
                   onClick={closeMenu}
-                  className="flex items-center justify-center space-x-2 w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-xl font-semibold transition-colors"
+                  className="flex items-center justify-center space-x-1 w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg font-medium transition-colors text-sm"
                 >
                   <span>👤</span>
-                  <span>Scan Your Privacy</span>
+                  <span>Scan Privacy</span>
                 </Link>
                 <Link 
                   href="/website"
                   onClick={closeMenu}
-                  className="flex items-center justify-center space-x-2 w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-xl font-semibold transition-colors"
+                  className="flex items-center justify-center space-x-1 w-full bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg font-medium transition-colors text-sm"
                 >
                   <span>🌐</span>
-                  <span>Audit Your Website</span>
+                  <span>Audit Website</span>
                 </Link>
               </div>
             </div>
