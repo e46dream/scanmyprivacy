@@ -357,3 +357,32 @@ NOTES: |
     bash backup.sh restore 614cc4c
 
 #===============================================================================
+
+#===============================================================================
+# BACKUP-009: Before subtitle punctuation fix
+#===============================================================================
+ID: BACKUP-009
+TIMESTAMP: 2026-04-04 11:11:33
+GIT_HASH: 1940683
+AUTHOR: ScanMyPrivacy Developer
+TAGS: ENHANCEMENT
+
+CHANGES:
+  [ADDED] Before subtitle punctuation fix
+  
+FILES_AFFECTED: 1 files
+    - BACKUP_LOG.db
+
+RESTORE_CMD: git reset --hard 1940683
+
+STATUS: ACTIVE
+
+NOTES: |
+  Backup created at 2026-04-04 11:11:33
+  Commit hash: 1940683
+  Files changed: 1
+  
+  TO RESTORE:
+    bash backup.sh restore 1940683
+
+#===============================================================================

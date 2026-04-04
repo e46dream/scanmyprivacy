@@ -36,7 +36,7 @@ export default function Home() {
               >
                 Start Personal Scan
               </Link>
-              <p className="text-xs text-slate-500 mt-3">Takes less than 60 seconds</p>
+              <p className="text-xs text-slate-500 mt-3">Takes less than 60 seconds • 100% Free</p>
             </div>
 
             {/* Website Side */}
@@ -52,7 +52,7 @@ export default function Home() {
               >
                 Start Website Scan
               </Link>
-              <p className="text-xs text-slate-500 mt-3">Free scan. Detailed Reports from $49</p>
+              <p className="text-xs text-slate-500 mt-3">Free scan • Detailed Reports from $49</p>
             </div>
           </div>
         </div>
