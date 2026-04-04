@@ -76,14 +76,14 @@ export default function PersonalPage() {
   return (
     <>
       <Navigation />
-      <main className="max-w-6xl mx-auto p-4">
-        <h1 className="text-3xl font-bold mb-2">Personal Privacy Scanner</h1>
-        <p className="text-slate-400 mb-6">Check your digital privacy in 30 seconds</p>
+      <main className="max-w-6xl mx-auto p-3 sm:p-4">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2">Personal Privacy Scanner</h1>
+        <p className="text-slate-400 mb-4 sm:mb-6 text-sm sm:text-base">Check your digital privacy in less than 60 seconds</p>
 
         {/* Score Card */}
-        <div className="bg-slate-800 rounded-xl p-6 mb-6 border border-slate-700">
-          <h2 className="text-xl font-semibold mb-4">Your Privacy Score</h2>
-          <div className="text-5xl font-bold mb-2" style={{ color: score > 80 ? '#4ade80' : score > 50 ? '#fbbf24' : '#ef4444' }}>
+        <div className="bg-slate-800 rounded-xl p-4 sm:p-6 mb-4 sm:mb-6 border border-slate-700">
+          <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Your Privacy Score</h2>
+          <div className="text-4xl sm:text-5xl font-bold mb-2" style={{ color: score > 80 ? '#4ade80' : score > 50 ? '#fbbf24' : '#ef4444' }}>
             {score}
           </div>
           <p className="text-slate-400">
@@ -92,24 +92,24 @@ export default function PersonalPage() {
         </div>
 
         {/* Test Results Grid */}
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {/* IP Test */}
-          <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
-            <h3 className="font-semibold mb-2">🌐 Public IP</h3>
-            <p className="text-lg font-mono">{ipData?.ip || 'Loading...'}</p>
+          <div className="bg-slate-800 rounded-xl p-3 sm:p-4 border border-slate-700">
+            <h3 className="font-semibold mb-2 text-sm sm:text-base">🌐 Public IP</h3>
+            <p className="text-base sm:text-lg font-mono break-all">{ipData?.ip || 'Loading...'}</p>
           </div>
 
           {/* WebRTC Test */}
-          <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
-            <h3 className="font-semibold mb-2">📹 WebRTC</h3>
+          <div className="bg-slate-800 rounded-xl p-3 sm:p-4 border border-slate-700">
+            <h3 className="font-semibold mb-2 text-sm sm:text-base">📹 WebRTC</h3>
             <p className={webrtcStatus === 'leak' ? 'text-red-400' : 'text-green-400'}>
               {webrtcStatus === 'checking' ? 'Checking...' : webrtcStatus === 'leak' ? '⚠️ Leak Detected' : '✅ Secure'}
             </p>
           </div>
 
           {/* Fingerprint */}
-          <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
-            <h3 className="font-semibold mb-2">👆 Browser Fingerprint</h3>
+          <div className="bg-slate-800 rounded-xl p-3 sm:p-4 border border-slate-700">
+            <h3 className="font-semibold mb-2 text-sm sm:text-base">👆 Browser Fingerprint</h3>
             {fingerprint && (
               <ul className="text-sm text-slate-400 space-y-1">
                 <li>Screen: {fingerprint.screen}</li>
@@ -120,28 +120,28 @@ export default function PersonalPage() {
           </div>
 
           {/* DNS Test */}
-          <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
-            <h3 className="font-semibold mb-2">🔍 DNS Check</h3>
-            <p className="text-slate-400">Using browser DNS configuration</p>
+          <div className="bg-slate-800 rounded-xl p-3 sm:p-4 border border-slate-700">
+            <h3 className="font-semibold mb-2 text-sm sm:text-base">🔍 DNS Check</h3>
+            <p className="text-slate-400 text-sm sm:text-base">Using browser DNS configuration</p>
           </div>
         </div>
 
         {/* Cross-promo CTA */}
-        <div className="mt-8 bg-purple-900/20 border border-purple-700 rounded-xl p-6">
-          <h3 className="text-lg font-semibold mb-2">Own a website or business?</h3>
-          <p className="text-slate-400 mb-4">
+        <div className="mt-6 sm:mt-8 bg-purple-900/20 border border-purple-700 rounded-xl p-4 sm:p-6">
+          <h3 className="text-base sm:text-lg font-semibold mb-2">Own a website or business?</h3>
+          <p className="text-slate-400 mb-3 sm:mb-4 text-sm sm:text-base">
             You're protecting YOUR privacy. But are you protecting YOUR USERS' privacy?
           </p>
           <Link 
             href="/website"
-            className="inline-block bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+            className="inline-block bg-purple-600 hover:bg-purple-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-colors text-sm sm:text-base"
           >
             Check Your Website Compliance →
           </Link>
         </div>
 
         {/* Affiliate Recommendations */}
-        <div className="mt-8 grid md:grid-cols-3 gap-4">
+        <div className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
           <a href="https://nordvpn.com/" target="_blank" rel="noopener" className="bg-slate-800 p-4 rounded-xl border border-slate-700 hover:border-blue-500 transition-colors">
             <h4 className="font-semibold">NordVPN</h4>
             <p className="text-sm text-slate-400">68% OFF - Best Overall</p>

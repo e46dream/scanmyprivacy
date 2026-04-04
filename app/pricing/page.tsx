@@ -20,19 +20,19 @@ export default function PricingPage() {
   return (
     <>
       <Navigation />
-      <main className="max-w-6xl mx-auto p-4">
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold mb-4">Simple, Transparent Pricing</h1>
-          <p className="text-slate-400">Choose the plan that works for your business</p>
+      <main className="max-w-6xl mx-auto p-3 sm:p-4">
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">Simple, Transparent Pricing</h1>
+          <p className="text-slate-400 text-sm sm:text-base">Choose the plan that works for your business</p>
         </div>
 
         {/* B2C - Personal (Free) */}
-        <div className="mb-12">
-          <h2 className="text-xl font-semibold mb-6 text-center">Personal Privacy Protection (100% Free)</h2>
-          <div className="bg-slate-800 rounded-xl p-6 border border-slate-700 max-w-2xl mx-auto">
-            <div className="flex items-center justify-between">
+        <div className="mb-8 sm:mb-12">
+          <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-center">Personal Privacy Protection (100% Free)</h2>
+          <div className="bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-700 max-w-2xl mx-auto">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <h3 className="text-lg font-semibold">Personal Privacy Scanner</h3>
+                <h3 className="text-base sm:text-lg font-semibold">Personal Privacy Scanner</h3>
                 <ul className="text-slate-400 text-sm mt-2 space-y-1">
                   <li>✓ IP Leak Detection</li>
                   <li>✓ Browser Fingerprint Analysis</li>
@@ -40,12 +40,12 @@ export default function PricingPage() {
                   <li>✓ WebRTC Security Test</li>
                 </ul>
               </div>
-              <div className="text-right">
-                <p className="text-3xl font-bold text-green-400">Free</p>
-                <p className="text-sm text-slate-500">Forever</p>
+              <div className="text-left sm:text-right">
+                <p className="text-2xl sm:text-3xl font-bold text-green-400">Free</p>
+                <p className="text-xs sm:text-sm text-slate-500">Forever</p>
                 <Link 
                   href="/personal"
-                  className="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
+                  className="mt-3 sm:mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-2 rounded-lg transition-colors text-sm sm:text-base"
                 >
                   Start Scanning
                 </Link>
@@ -56,8 +56,8 @@ export default function PricingPage() {
 
         {/* B2B - Website Compliance */}
         <div>
-          <h2 className="text-xl font-semibold mb-6 text-center">Website Compliance (B2B)</h2>
-          <div className="grid md:grid-cols-3 gap-6">
+          <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-center">Website Compliance (B2B)</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {/* Free Scan */}
             <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
               <h3 className="text-lg font-semibold mb-2">Free Scan</h3>
@@ -118,9 +118,9 @@ export default function PricingPage() {
         </div>
 
         {/* FAQ */}
-        <div className="mt-16 max-w-3xl mx-auto">
-          <h2 className="text-xl font-semibold mb-6 text-center">Frequently Asked Questions</h2>
-          <div className="space-y-4">
+        <div className="mt-12 sm:mt-16 max-w-3xl mx-auto px-2 sm:px-0">
+          <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-center">Frequently Asked Questions</h2>
+          <div className="space-y-3 sm:space-y-4">
             <details className="bg-slate-800 rounded-lg p-4 border border-slate-700">
               <summary className="font-semibold cursor-pointer">What's included in the detailed report?</summary>
               <p className="text-slate-400 mt-2 text-sm">

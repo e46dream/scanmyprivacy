@@ -52,24 +52,24 @@ export default function WebsitePage() {
   return (
     <>
       <Navigation />
-      <main className="max-w-6xl mx-auto p-4">
-        <h1 className="text-3xl font-bold mb-2">Website Compliance Scanner</h1>
-        <p className="text-slate-400 mb-6">Check your website for GDPR/CCPA compliance issues</p>
+      <main className="max-w-6xl mx-auto p-3 sm:p-4">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2">Website Compliance Scanner</h1>
+        <p className="text-slate-400 mb-4 sm:mb-6 text-sm sm:text-base">Check your website for GDPR/CCPA compliance issues</p>
 
         {/* URL Input */}
-        <div className="bg-slate-800 rounded-xl p-6 mb-6 border border-slate-700">
-          <div className="flex gap-4">
+        <div className="bg-slate-800 rounded-xl p-4 sm:p-6 mb-4 sm:mb-6 border border-slate-700">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <input
               type="url"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://example.com"
-              className="flex-1 px-4 py-3 rounded-lg bg-slate-900 border border-slate-600 text-white"
+              className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg bg-slate-900 border border-slate-600 text-white text-sm sm:text-base"
             />
             <button
               onClick={scanWebsite}
               disabled={scanning || !url}
-              className="bg-purple-600 hover:bg-purple-700 disabled:bg-slate-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+              className="bg-purple-600 hover:bg-purple-700 disabled:bg-slate-600 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold transition-colors text-sm sm:text-base whitespace-nowrap"
             >
               {scanning ? 'Scanning...' : 'Scan Now'}
             </button>
@@ -81,14 +81,14 @@ export default function WebsitePage() {
         {results && (
           <div className="space-y-6">
             {/* Score Card */}
-            <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-              <div className="flex items-center justify-between">
+            <div className="bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-700">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                  <h2 className="text-xl font-semibold">Compliance Score</h2>
-                  <p className="text-slate-400">{results.url}</p>
+                  <h2 className="text-lg sm:text-xl font-semibold">Compliance Score</h2>
+                  <p className="text-slate-400 text-sm break-all">{results.url}</p>
                 </div>
-                <div className="text-right">
-                  <div className="text-5xl font-bold" style={{ color: results.score > 80 ? '#4ade80' : results.score > 50 ? '#fbbf24' : '#ef4444' }}>
+                <div className="text-left sm:text-right">
+                  <div className="text-4xl sm:text-5xl font-bold" style={{ color: results.score > 80 ? '#4ade80' : results.score > 50 ? '#fbbf24' : '#ef4444' }}>
                     {results.score}
                   </div>
                   <p className="text-sm text-slate-400">/ 100</p>
@@ -154,7 +154,7 @@ export default function WebsitePage() {
                   <p className="text-2xl font-bold mt-2">$49/mo</p>
                 </div>
               </div>
-              <button className="mt-4 bg-white text-purple-900 hover:bg-slate-100 px-8 py-3 rounded-lg font-semibold transition-colors w-full md:w-auto">
+              <button className="mt-4 bg-white text-purple-900 hover:bg-slate-100 px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold transition-colors w-full sm:w-auto text-sm sm:text-base">
                 Buy Detailed Report - $49
               </button>
             </div>
@@ -162,14 +162,14 @@ export default function WebsitePage() {
         )}
 
         {/* Cross-promo */}
-        <div className="mt-8 bg-blue-900/20 border border-blue-700 rounded-xl p-6">
-          <h3 className="text-lg font-semibold mb-2">Protecting your users' privacy starts with yours</h3>
-          <p className="text-slate-400 mb-4">
+        <div className="mt-6 sm:mt-8 bg-blue-900/20 border border-blue-700 rounded-xl p-4 sm:p-6">
+          <h3 className="text-base sm:text-lg font-semibold mb-2">Protecting your users' privacy starts with yours</h3>
+          <p className="text-slate-400 mb-3 sm:mb-4 text-sm sm:text-base">
             Check your own digital privacy to understand what your users experience.
           </p>
           <Link 
             href="/personal"
-            className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+            className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-colors text-sm sm:text-base"
           >
             Scan Your Personal Privacy →
           </Link>

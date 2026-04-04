@@ -7,32 +7,32 @@ export default function Home() {
       <Navigation />
       
       {/* Hero Section - Dual Value Prop */}
-      <section className="relative py-20 px-4 sm:px-6 lg:px-8">
+      <section className="relative py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6">
             <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
               Scan Your Privacy.
             </span>
             <br />
             <span className="text-white">Protect Your Data.</span>
           </h1>
-          <p className="text-xl text-slate-400 mb-8 max-w-3xl mx-auto">
+          <p className="text-lg sm:text-xl text-slate-400 mb-6 sm:mb-8 max-w-3xl mx-auto px-2 sm:px-0">
             Your privacy matters, whether you're protecting yourself or protecting your users. 
             We help with both.
           </p>
 
           {/* Two-Sided Value Prop */}
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mt-12">
+          <div className="grid md:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto mt-8 sm:mt-12">
             {/* Personal Side */}
-            <div className="bg-slate-800/50 rounded-2xl p-8 border border-slate-700 backdrop-blur-sm flex flex-col">
+            <div className="bg-slate-800/50 rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-slate-700 backdrop-blur-sm flex flex-col">
               <div className="text-4xl mb-4">👤</div>
-              <h2 className="text-2xl font-bold mb-3">Protect Your Privacy</h2>
-              <p className="text-slate-400 mb-6 flex-grow">
+              <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">Protect Your Privacy</h2>
+              <p className="text-slate-400 mb-4 sm:mb-6 flex-grow text-sm sm:text-base">
                 See what trackers are following you online. Check for IP leaks, browser fingerprinting, and data breaches.
               </p>
               <Link 
                 href="/personal"
-                className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+                className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold transition-colors text-sm sm:text-base"
               >
                 Start Personal Scan
               </Link>
@@ -40,15 +40,15 @@ export default function Home() {
             </div>
 
             {/* Website Side */}
-            <div className="bg-slate-800/50 rounded-2xl p-8 border border-slate-700 backdrop-blur-sm flex flex-col">
+            <div className="bg-slate-800/50 rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-slate-700 backdrop-blur-sm flex flex-col">
               <div className="text-4xl mb-4">🌐</div>
-              <h2 className="text-2xl font-bold mb-3">Protect Your Users</h2>
-              <p className="text-slate-400 mb-6 flex-grow">
+              <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">Protect Your Users</h2>
+              <p className="text-slate-400 mb-4 sm:mb-6 flex-grow text-sm sm:text-base">
                 Audit your website for GDPR/CCPA compliance. Avoid fines up to $20M.
               </p>
               <Link 
                 href="/website"
-                className="inline-block bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+                className="inline-block bg-purple-600 hover:bg-purple-700 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold transition-colors text-sm sm:text-base"
               >
                 Start Website Scan
               </Link>
@@ -59,31 +59,31 @@ export default function Home() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-12 bg-slate-800/30 border-y border-slate-700">
+      <section className="py-8 sm:py-12 bg-slate-800/30 border-y border-slate-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-3 gap-8 text-center">
-            <div>
-              <div className="text-3xl font-bold text-blue-400">500K+</div>
-              <div className="text-sm text-slate-400 mt-1">Privacy Scans This Month</div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 text-center">
+            <div className="py-2">
+              <div className="text-2xl sm:text-3xl font-bold text-blue-400">500K+</div>
+              <div className="text-xs sm:text-sm text-slate-400 mt-1">Privacy Scans This Month</div>
             </div>
-            <div>
-              <div className="text-3xl font-bold text-purple-400">50K+</div>
-              <div className="text-sm text-slate-400 mt-1">Websites Audited</div>
+            <div className="py-2">
+              <div className="text-2xl sm:text-3xl font-bold text-purple-400">50K+</div>
+              <div className="text-xs sm:text-sm text-slate-400 mt-1">Websites Audited</div>
             </div>
-            <div>
-              <div className="text-3xl font-bold text-green-400">99.7%</div>
-              <div className="text-sm text-slate-400 mt-1">Uptime • No Data Stored</div>
+            <div className="py-2">
+              <div className="text-2xl sm:text-3xl font-bold text-green-400">99.7%</div>
+              <div className="text-xs sm:text-sm text-slate-400 mt-1">Uptime • No Data Stored</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Feature Highlights */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">Complete Privacy Protection</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12">Complete Privacy Protection</h2>
           
-          <div className="grid md:grid-cols-2 gap-12">
+          <div className="grid sm:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
             {/* Personal Features */}
             <div className="space-y-4">
               <h3 className="text-xl font-semibold text-blue-400">Personal Scanner</h3>
@@ -143,7 +143,7 @@ export default function Home() {
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-slate-800/30">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl font-bold text-center mb-8">Latest Privacy Insights</h2>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             <article className="bg-slate-800 rounded-lg p-6 border border-slate-700 hover:border-blue-500 transition-colors">
               <h3 className="font-semibold mb-2">Why Google Analytics Violates GDPR</h3>
               <p className="text-sm text-slate-400">Learn about the common compliance mistakes website owners make.</p>
@@ -164,11 +164,11 @@ export default function Home() {
       </section>
 
       {/* CTA Footer */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 text-center">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold mb-4">Your data is valuable.</h2>
-          <p className="text-xl text-slate-400 mb-8">Don't let companies steal it. Take control today.</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+      <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 text-center">
+        <div className="max-w-3xl mx-auto px-2 sm:px-0">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">Your data is valuable.</h2>
+          <p className="text-lg sm:text-xl text-slate-400 mb-6 sm:mb-8">Don't let companies steal it. Take control today.</p>
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
             <Link 
               href="/personal"
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors"
