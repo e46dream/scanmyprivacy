@@ -127,61 +127,61 @@ export default function Navigation() {
           />
           
           {/* Floating Menu */}
-          <div className="fixed inset-x-4 top-20 md:hidden z-50 pointer-events-none">
-            <div className="bg-slate-800/95 backdrop-blur-xl border border-slate-700 rounded-xl shadow-2xl pointer-events-auto max-w-sm mx-auto">
+          <div className="fixed right-2 top-16 md:hidden z-50">
+            <div className="bg-slate-800/95 backdrop-blur-xl border border-slate-700 rounded-lg shadow-2xl min-w-[160px]">
               {/* Menu Items */}
-              <div className="p-1.5">
+              <div className="py-1">
                 <Link 
                   href="/personal" 
                   onClick={closeMenu}
-                  className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
+                  className="flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
                 >
-                  <span>👤</span>
-                  <span>Personal Scan</span>
+                  <span className="text-sm">👤</span>
+                  <span>Personal</span>
                 </Link>
                 <Link 
                   href="/website" 
                   onClick={closeMenu}
-                  className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
+                  className="flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
                 >
-                  <span>🌐</span>
-                  <span>Website Scan</span>
+                  <span className="text-sm">🌐</span>
+                  <span>Website</span>
                 </Link>
                 <Link 
                   href="/pricing" 
                   onClick={closeMenu}
-                  className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
+                  className="flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
                 >
-                  <span>💰</span>
+                  <span className="text-sm">💰</span>
                   <span>Pricing</span>
                 </Link>
                 <Link 
                   href="/blog" 
                   onClick={closeMenu}
-                  className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
+                  className="flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
                 >
-                  <span>📝</span>
+                  <span className="text-sm">📝</span>
                   <span>Blog</span>
                 </Link>
               </div>
 
               {/* CTA Section */}
-              <div className="px-1.5 pb-1.5 space-y-1">
+              <div className="border-t border-slate-700 py-1 px-1 space-y-0.5">
                 <Link 
                   href="/personal"
                   onClick={closeMenu}
-                  className="flex items-center justify-center space-x-1 w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg font-medium transition-colors text-sm"
+                  className="flex items-center justify-center space-x-1 w-full bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded font-medium transition-colors text-xs"
                 >
                   <span>👤</span>
-                  <span>Scan Privacy</span>
+                  <span>Scan</span>
                 </Link>
                 <Link 
                   href="/website"
                   onClick={closeMenu}
-                  className="flex items-center justify-center space-x-1 w-full bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg font-medium transition-colors text-sm"
+                  className="flex items-center justify-center space-x-1 w-full bg-purple-600 hover:bg-purple-700 text-white py-1 px-2 rounded font-medium transition-colors text-xs"
                 >
                   <span>🌐</span>
-                  <span>Audit Website</span>
+                  <span>Audit</span>
                 </Link>
               </div>
             </div>
