@@ -24,10 +24,10 @@ export default function Home() {
           {/* Two-Sided Value Prop */}
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mt-12">
             {/* Personal Side */}
-            <div className="bg-slate-800/50 rounded-2xl p-8 border border-slate-700 backdrop-blur-sm">
+            <div className="bg-slate-800/50 rounded-2xl p-8 border border-slate-700 backdrop-blur-sm flex flex-col">
               <div className="text-4xl mb-4">👤</div>
               <h2 className="text-2xl font-bold mb-3">Protect Your Privacy</h2>
-              <p className="text-slate-400 mb-6">
+              <p className="text-slate-400 mb-6 flex-grow">
                 See what trackers are following you online. Check for IP leaks, browser fingerprinting, and data breaches.
               </p>
               <Link 
@@ -36,14 +36,14 @@ export default function Home() {
               >
                 Start Personal Scan
               </Link>
-              <p className="text-xs text-slate-500 mt-3">Takes 2 minutes • 100% Free</p>
+              <p className="text-xs text-slate-500 mt-3">Takes less than 60 seconds</p>
             </div>
 
             {/* Website Side */}
-            <div className="bg-slate-800/50 rounded-2xl p-8 border border-slate-700 backdrop-blur-sm">
+            <div className="bg-slate-800/50 rounded-2xl p-8 border border-slate-700 backdrop-blur-sm flex flex-col">
               <div className="text-4xl mb-4">🌐</div>
               <h2 className="text-2xl font-bold mb-3">Protect Your Users</h2>
-              <p className="text-slate-400 mb-6">
+              <p className="text-slate-400 mb-6 flex-grow">
                 Audit your website for GDPR/CCPA compliance. Avoid fines up to $20M.
               </p>
               <Link 
@@ -52,7 +52,7 @@ export default function Home() {
               >
                 Start Website Scan
               </Link>
-              <p className="text-xs text-slate-500 mt-3">Free scan • Reports from $49</p>
+              <p className="text-xs text-slate-500 mt-3">Free scan. Detailed Reports from $49</p>
             </div>
           </div>
         </div>
