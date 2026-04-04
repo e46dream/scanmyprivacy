@@ -17,7 +17,7 @@ export default function Home() {
             <span className="text-white">Protect Your Data.</span>
           </h1>
           <p className="text-xl text-slate-400 mb-8 max-w-3xl mx-auto">
-            Your privacy matters—whether you're protecting yourself or protecting your users. 
+            Your privacy matters, whether you're protecting yourself or protecting your users. 
             We help with both.
           </p>
 
