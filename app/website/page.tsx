@@ -13,6 +13,7 @@ export default function WebsitePage() {
   const [results, setResults] = useState<any>(null);
   const [email, setEmail] = useState('');
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'paypal' | 'upi'>('stripe');
 
   const scanWebsite = async () => {
     if (!url) return;
@@ -89,22 +90,87 @@ export default function WebsitePage() {
     setCheckoutLoading(true);
     
     try {
-      // Create Stripe checkout session via your API
-      const response = await fetch(`${API_URL}/create-checkout`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          targetUrl: results.url,
-          userEmail: email,
-        }),
-      });
-      
-      const { url: checkoutUrl } = await response.json();
-      
-      if (checkoutUrl) {
-        window.location.href = checkoutUrl;
-      } else {
-        throw new Error('No checkout URL returned');
+      if (paymentMethod === 'stripe') {
+        // Stripe checkout
+        const response = await fetch(`${API_URL}/create-checkout`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            targetUrl: results.url,
+            userEmail: email,
+          }),
+        });
+        
+        const { url: checkoutUrl } = await response.json();
+        
+        if (checkoutUrl) {
+          window.location.href = checkoutUrl;
+        } else {
+          throw new Error('No checkout URL returned');
+        }
+      } else if (paymentMethod === 'paypal') {
+        // PayPal checkout
+        const response = await fetch(`${API_URL}/create-paypal-order`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            targetUrl: results.url,
+            userEmail: email,
+          }),
+        });
+        
+        const { orderId } = await response.json();
+        
+        if (orderId) {
+          // Redirect to PayPal approval
+          window.location.href = `https://www.sandbox.paypal.com/checkoutnow?token=${orderId}`;
+        } else {
+          throw new Error('No PayPal order ID returned');
+        }
+      } else if (paymentMethod === 'upi') {
+        // UPI / Razorpay checkout
+        const response = await fetch(`${API_URL}/create-upi-order`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            targetUrl: results.url,
+            userEmail: email,
+          }),
+        });
+        
+        const { orderId, keyId, amount } = await response.json();
+        
+        if (orderId && keyId) {
+          // Load Razorpay checkout
+          const script = document.createElement('script');
+          script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+          script.onload = () => {
+            const options = {
+              key: keyId,
+              amount: amount,
+              currency: 'INR',
+              name: 'PrivacyScan',
+              description: `Compliance Report for ${results.url}`,
+              order_id: orderId,
+              handler: function (response: any) {
+                // Payment successful
+                window.location.href = '/payment/success';
+              },
+              prefill: {
+                email: email,
+              },
+              theme: {
+                color: '#7c3aed',
+              },
+            };
+            
+            const rzp = new (window as any).Razorpay(options);
+            rzp.open();
+          };
+          document.body.appendChild(script);
+        } else {
+          throw new Error('No UPI order details returned');
+        }
       }
     } catch (err) {
       console.error('Checkout error:', err);
@@ -219,7 +285,7 @@ export default function WebsitePage() {
                 </div>
               </div>
               
-              {/* Email input and purchase button */}
+              {/* Payment method selection */}
               <div className="mt-6 space-y-4">
                 <div className="max-w-md">
                   <label className="block text-sm font-medium mb-2">Email for report delivery</label>
@@ -231,15 +297,58 @@ export default function WebsitePage() {
                     className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-600 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
                   />
                 </div>
+
+                {/* Payment Methods */}
+                <div className="grid grid-cols-3 gap-3 max-w-md">
+                  <button
+                    onClick={() => setPaymentMethod('stripe')}
+                    className={`px-4 py-3 rounded-lg font-medium transition-colors ${
+                      paymentMethod === 'stripe'
+                        ? 'bg-purple-600 text-white border-2 border-purple-400'
+                        : 'bg-slate-800 text-slate-300 border border-slate-600 hover:bg-slate-700'
+                    }`}
+                  >
+                    💳 Card
+                    <span className="block text-xs font-normal mt-1">$49 USD</span>
+                  </button>
+                  <button
+                    onClick={() => setPaymentMethod('paypal')}
+                    className={`px-4 py-3 rounded-lg font-medium transition-colors ${
+                      paymentMethod === 'paypal'
+                        ? 'bg-blue-600 text-white border-2 border-blue-400'
+                        : 'bg-slate-800 text-slate-300 border border-slate-600 hover:bg-slate-700'
+                    }`}
+                  >
+                    🅿️ PayPal
+                    <span className="block text-xs font-normal mt-1">$49 USD</span>
+                  </button>
+                  <button
+                    onClick={() => setPaymentMethod('upi')}
+                    className={`px-4 py-3 rounded-lg font-medium transition-colors ${
+                      paymentMethod === 'upi'
+                        ? 'bg-green-600 text-white border-2 border-green-400'
+                        : 'bg-slate-800 text-slate-300 border border-slate-600 hover:bg-slate-700'
+                    }`}
+                  >
+                    🇮🇳 UPI
+                    <span className="block text-xs font-normal mt-1">₹3900 INR</span>
+                  </button>
+                </div>
+
                 <button 
                   onClick={handlePurchase}
                   disabled={checkoutLoading || !email || !results}
                   className="bg-white text-purple-900 hover:bg-slate-100 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed px-8 py-3 rounded-lg font-semibold transition-colors"
                 >
-                  {checkoutLoading ? 'Redirecting to checkout...' : 'Buy Detailed Report - $49'}
+                  {checkoutLoading 
+                    ? 'Redirecting to checkout...' 
+                    : paymentMethod === 'upi' 
+                      ? 'Pay ₹39.00 via UPI'
+                      : 'Buy Detailed Report - $49'}
                 </button>
                 <p className="text-xs text-slate-400">
-                  Secure payment via Stripe. Report delivered within 2 minutes.
+                  Secure payment via {paymentMethod === 'stripe' ? 'Stripe' : paymentMethod === 'paypal' ? 'PayPal' : 'Razorpay'}. 
+                  Report delivered within 2 minutes.
                 </p>
               </div>
             </div>

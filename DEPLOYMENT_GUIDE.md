@@ -27,7 +27,8 @@
                        ▼            ▼            ▼
                   ┌────────┐   ┌────────┐   ┌────────┐
                   │Supabase│   │ Stripe │   │Browser-│
-                  │DB+Storage    │Payments│   │less.io │
+                  │DB+Storage│   │ PayPal │   │less.io │
+                  │        │   │ Razorpay│   │        │
                   └────────┘   └────────┘   └────────┘
 ```
 
@@ -195,6 +196,68 @@
 
 ---
 
+### Phase 4B: PayPal Setup (Optional)
+
+**Time:** 10 minutes  
+**Cost:** 2.9% + fixed fee per transaction
+
+1. Go to https://developer.paypal.com
+2. Sign up / Log in
+3. Go to "Apps & Credentials"
+4. Click "Create App"
+5. Name: `ScanMyPrivacy`
+6. Copy:
+   - `Client ID`
+   - `Secret`
+7. Add to Railway:
+   ```
+   PAYPAL_CLIENT_ID=...
+   PAYPAL_SECRET=...
+   PAYPAL_ENV=sandbox  # Change to 'live' for production
+   ```
+
+**PayPal Webhook (Production):**
+1. PayPal Dashboard → Webhooks
+2. Add webhook URL: `https://your-railway-url.up.railway.app/webhook/paypal`
+3. Select event: `Checkout order completed`
+4. Copy webhook ID for verification
+
+---
+
+### Phase 4C: Razorpay/UPI Setup (Optional - India)
+
+**Time:** 10 minutes  
+**Cost:** 2% per transaction (Indian market)
+
+1. Go to https://razorpay.com
+2. Sign up with business details
+3. Complete KYC verification (required for live mode)
+4. Go to Settings → API Keys
+5. Generate test keys
+6. Copy:
+   - `Key ID` (starts with `rzp_test_`)
+   - `Key Secret`
+7. Add to Railway:
+   ```
+   RAZORPAY_KEY_ID=rzp_test_...
+   RAZORPAY_KEY_SECRET=...
+   ```
+
+**Razorpay Webhook:**
+1. Razorpay Dashboard → Webhooks
+2. Add webhook URL: `https://your-railway-url.up.railway.app/webhook/razorpay`
+3. Select events:
+   - `payment.captured`
+   - `order.paid`
+4. Save and copy webhook secret
+
+**UPI Features:**
+- Google Pay, PhonePe, Paytm integration
+- QR code payments
+- 15+ Indian banks supported
+
+---
+
 ### Phase 5: Browserless Setup
 
 **Time:** 2 minutes  
@@ -267,7 +330,9 @@
 |---------|--------------|--------------|-----------|
 | **Supabase** | Database, PDF storage | supabase.com | 500MB DB + 1GB storage |
 | **Browserless** | Headless Chrome scanning | browserless.io | 1000 units/month |
-| **Stripe** | Payments ($49 reports) | stripe.com | No fees until you earn |
+| **Stripe** | Card payments (Global) | stripe.com | No fees until you earn |
+| **PayPal** | PayPal payments (Global) | developer.paypal.com | 2.9% + fee |
+| **Razorpay** | UPI payments (India) | razorpay.com | 2% per transaction |
 | **PDFBolt** | PDF generation | pdfbolt.com | Pay per use |
 | **Resend** | Email delivery | resend.com | 3000 emails/month |
 | **Railway** | API hosting | railway.app | $5 credit/month |
@@ -283,16 +348,37 @@
 3. Click "Scan Now"
 4. Should show score and issues within 10 seconds
 
-### Test 2: Payment Flow
+### Test 2: Payment Flow - Stripe
 1. Run scan on any URL
 2. Enter your email
-3. Click "Buy Detailed Report - $49"
-4. Should redirect to Stripe checkout
-5. Use test card: `4242 4242 4242 4242`, any future date, any CVC
-6. Complete payment
-7. Check email for report (within 2 minutes)
+3. Select 💳 Card ($49 USD)
+4. Click "Buy Detailed Report"
+5. Should redirect to Stripe checkout
+6. Use test card: `4242 4242 4242 4242`, any future date, any CVC
+7. Complete payment
+8. Check email for report (within 2 minutes)
 
-### Test 3: Webhook
+### Test 3: Payment Flow - PayPal
+1. Run scan on any URL
+2. Enter your email
+3. Select 🅿️ PayPal ($49 USD)
+4. Click "Buy Detailed Report"
+5. Should redirect to PayPal sandbox
+6. Login with test buyer account
+7. Complete payment
+8. Check email for report
+
+### Test 4: Payment Flow - UPI (India)
+1. Run scan on any URL
+2. Enter your email
+3. Select 🇮🇳 UPI (₹3900 INR)
+4. Click "Pay via UPI"
+5. Razorpay checkout should open
+6. Select UPI → Enter test UPI ID: `success@razorpay`
+7. Complete payment
+8. Check email for report
+
+### Test 5: Webhook
 1. Check Railway logs:
    ```
    Railway → Project → Deployments → Logs

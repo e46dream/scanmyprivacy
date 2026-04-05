@@ -32,6 +32,17 @@ const supabase = createClient(
 )
 const resend = new Resend(process.env.RESEND_API_KEY)
 
+// PayPal configuration
+const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID
+const PAYPAL_SECRET = process.env.PAYPAL_SECRET
+const PAYPAL_API = process.env.PAYPAL_ENV === 'live' 
+  ? 'https://api-m.paypal.com'
+  : 'https://api-m.sandbox.paypal.com'
+
+// Razorpay (UPI for India) configuration
+const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID
+const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET
+
 // ---------------------------------------------------------------------------
 // Health check
 // ---------------------------------------------------------------------------
@@ -154,10 +165,246 @@ app.post('/create-checkout', async (req, res) => {
       cancel_url: `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/payment/cancel`,
     })
 
-    res.json({ url: session.url })
+    res.json({ url: session.url, provider: 'stripe' })
   } catch (err) {
     console.error('Checkout error:', err)
     res.status(500).json({ error: 'Failed to create checkout session' })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// PayPal: Create order
+// ---------------------------------------------------------------------------
+app.post('/create-paypal-order', async (req, res) => {
+  const { targetUrl, userEmail } = req.body
+  
+  if (!targetUrl || !userEmail) {
+    return res.status(400).json({ error: 'URL and email are required' })
+  }
+
+  try {
+    // Get PayPal access token
+    const authResponse = await fetch(`${PAYPAL_API}/v1/oauth2/token`, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Basic ' + Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET}`).toString('base64'),
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: 'grant_type=client_credentials',
+    })
+    
+    const authData = await authResponse.json()
+    
+    // Create order
+    const orderResponse = await fetch(`${PAYPAL_API}/v2/checkout/orders`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${authData.access_token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        intent: 'CAPTURE',
+        purchase_units: [{
+          amount: {
+            currency_code: 'USD',
+            value: '49.00',
+          },
+          description: `Privacy Compliance Report for ${new URL(targetUrl).hostname}`,
+          custom_id: JSON.stringify({ targetUrl, userEmail }),
+        }],
+        application_context: {
+          return_url: `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/payment/success?provider=paypal`,
+          cancel_url: `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/payment/cancel`,
+        },
+      }),
+    })
+    
+    const orderData = await orderResponse.json()
+    
+    if (orderData.id) {
+      res.json({ orderId: orderData.id, provider: 'paypal' })
+    } else {
+      throw new Error('PayPal order creation failed')
+    }
+  } catch (err) {
+    console.error('PayPal order error:', err)
+    res.status(500).json({ error: 'Failed to create PayPal order' })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// PayPal: Capture payment (called after user approves)
+// ---------------------------------------------------------------------------
+app.post('/capture-paypal-order', async (req, res) => {
+  const { orderId } = req.body
+  
+  if (!orderId) {
+    return res.status(400).json({ error: 'Order ID is required' })
+  }
+
+  try {
+    // Get access token
+    const authResponse = await fetch(`${PAYPAL_API}/v1/oauth2/token`, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Basic ' + Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET}`).toString('base64'),
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: 'grant_type=client_credentials',
+    })
+    
+    const authData = await authResponse.json()
+    
+    // Capture the order
+    const captureResponse = await fetch(`${PAYPAL_API}/v2/checkout/orders/${orderId}/capture`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${authData.access_token}`,
+        'Content-Type': 'application/json',
+      },
+    })
+    
+    const captureData = await captureResponse.json()
+    
+    if (captureData.status === 'COMPLETED') {
+      const customData = JSON.parse(captureData.purchase_units[0].custom_id)
+      const { targetUrl, userEmail } = customData
+      
+      // Create scan job in Supabase
+      const { data: job, error } = await supabase
+        .from('scan_jobs')
+        .insert({
+          user_email:  userEmail,
+          target_url:  targetUrl,
+          status:      'pending',
+          payment_id:  orderId,
+          amount_paid: 4900,
+        })
+        .select()
+        .single()
+
+      if (error) {
+        console.error('Failed to create scan job:', error)
+        return res.status(500).json({ error: 'DB write failed' })
+      }
+
+      // Run scan async
+      runScanJob(job.id, targetUrl, userEmail).catch(err => {
+        console.error(`Scan job ${job.id} failed:`, err)
+      })
+
+      res.json({ success: true, scanId: job.id })
+    } else {
+      res.status(400).json({ error: 'Payment not completed' })
+    }
+  } catch (err) {
+    console.error('PayPal capture error:', err)
+    res.status(500).json({ error: 'Failed to capture payment' })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// UPI / Razorpay: Create order for India payments
+// ---------------------------------------------------------------------------
+app.post('/create-upi-order', async (req, res) => {
+  const { targetUrl, userEmail } = req.body
+  
+  if (!targetUrl || !userEmail) {
+    return res.status(400).json({ error: 'URL and email are required' })
+  }
+
+  if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
+    return res.status(500).json({ error: 'Razorpay not configured' })
+  }
+
+  try {
+    const domain = new URL(targetUrl).hostname
+    
+    // Create Razorpay order
+    const orderResponse = await fetch('https://api.razorpay.com/v1/orders', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Basic ' + Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`).toString('base64'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        amount: 3900, // ₹39.00 (approx $49 in INR for Indian market)
+        currency: 'INR',
+        receipt: `scan_${Date.now()}`,
+        notes: {
+          targetUrl,
+          userEmail,
+          domain,
+        },
+      }),
+    })
+    
+    const orderData = await orderResponse.json()
+    
+    if (orderData.id) {
+      res.json({
+        orderId: orderData.id,
+        provider: 'razorpay',
+        keyId: RAZORPAY_KEY_ID,
+        amount: 3900,
+        currency: 'INR',
+        notes: {
+          targetUrl,
+          userEmail,
+        },
+      })
+    } else {
+      throw new Error('Razorpay order creation failed')
+    }
+  } catch (err) {
+    console.error('Razorpay order error:', err)
+    res.status(500).json({ error: 'Failed to create UPI order' })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// UPI / Razorpay: Webhook handler
+// ---------------------------------------------------------------------------
+app.post('/webhook/razorpay', async (req, res) => {
+  // Note: In production, verify webhook signature
+  // https://razorpay.com/docs/webhooks/validate-test/
+  
+  const event = req.body
+  
+  if (event.event === 'payment.captured') {
+    const payment = event.payload.payment.entity
+    const notes = payment.notes
+    
+    if (!notes || !notes.targetUrl || !notes.userEmail) {
+      return res.status(400).json({ error: 'Missing metadata' })
+    }
+    
+    // Create scan job
+    const { data: job, error } = await supabase
+      .from('scan_jobs')
+      .insert({
+        user_email:  notes.userEmail,
+        target_url:  notes.targetUrl,
+        status:      'pending',
+        payment_id:  payment.order_id,
+        amount_paid: payment.amount,
+      })
+      .select()
+      .single()
+    
+    if (error) {
+      console.error('Failed to create scan job:', error)
+      return res.status(500).json({ error: 'DB write failed' })
+    }
+    
+    // Run scan async
+    runScanJob(job.id, notes.targetUrl, notes.userEmail).catch(err => {
+      console.error(`Scan job ${job.id} failed:`, err)
+    })
+    
+    res.json({ received: true })
+  } else {
+    res.json({ received: true })
   }
 })
 
