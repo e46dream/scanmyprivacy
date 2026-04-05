@@ -4,24 +4,73 @@ import Navigation from '@/components/Navigation';
 import Link from 'next/link';
 import { useState } from 'react';
 
+// API endpoint - change to your Railway URL in production
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+
 export default function WebsitePage() {
   const [url, setUrl] = useState('');
   const [scanning, setScanning] = useState(false);
   const [results, setResults] = useState<any>(null);
+  const [email, setEmail] = useState('');
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   const scanWebsite = async () => {
     if (!url) return;
     setScanning(true);
     
     try {
-      const response = await fetch(`/api/website-scan?url=${encodeURIComponent(url)}`);
+      // Normalize URL
+      let targetUrl = url.trim();
+      if (!targetUrl.startsWith('http')) {
+        targetUrl = 'https://' + targetUrl;
+      }
+
+      // Call the scanner API
+      const response = await fetch(`${API_URL}/scan?url=${encodeURIComponent(targetUrl)}`);
+      
+      if (!response.ok) {
+        throw new Error('Scan failed');
+      }
+      
       const data = await response.json();
-      setResults(data);
-    } catch {
+      
+      // Transform scanner results to match UI format
+      const transformedResults = {
+        url: data.meta.url,
+        score: data.scoring.score,
+        grade: data.scoring.grade,
+        status: data.scoring.status,
+        issues: [
+          ...data.criticalIssues.map((issue: any) => ({
+            severity: 'critical',
+            title: issue.name,
+            description: issue.detail,
+            fix: issue.fix,
+            gdprArticle: issue.gdprArticle
+          })),
+          ...data.warnings.map((issue: any) => ({
+            severity: 'high',
+            title: issue.name,
+            description: issue.detail,
+            fix: issue.fix,
+            gdprArticle: issue.gdprArticle
+          }))
+        ],
+        checks: data.checks,
+        cookies: data.cookieTable,
+        trackers: data.trackerList,
+        rawData: data
+      };
+      
+      setResults(transformedResults);
+    } catch (err) {
+      console.error('Scan error:', err);
       // Demo mode fallback
       setResults({
         url,
         score: Math.floor(Math.random() * 40) + 30,
+        grade: 'F',
+        status: 'non-compliant',
         issues: [
           { severity: 'critical', title: 'Cookie consent banner missing', description: 'Required for GDPR compliance' },
           { severity: 'high', title: 'Google Analytics loads before consent', description: 'Violation of ePrivacy Directive' },
@@ -32,6 +81,36 @@ export default function WebsitePage() {
     }
     
     setScanning(false);
+  };
+
+  const handlePurchase = async () => {
+    if (!email || !results) return;
+    
+    setCheckoutLoading(true);
+    
+    try {
+      // Create Stripe checkout session via your API
+      const response = await fetch(`${API_URL}/create-checkout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          targetUrl: results.url,
+          userEmail: email,
+        }),
+      });
+      
+      const { url: checkoutUrl } = await response.json();
+      
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl;
+      } else {
+        throw new Error('No checkout URL returned');
+      }
+    } catch (err) {
+      console.error('Checkout error:', err);
+      alert('Failed to start checkout. Please try again.');
+      setCheckoutLoading(false);
+    }
   };
 
   return (
@@ -139,9 +218,30 @@ export default function WebsitePage() {
                   <p className="text-2xl font-bold mt-2">$49/mo</p>
                 </div>
               </div>
-              <button className="mt-4 bg-white text-purple-900 hover:bg-slate-100 px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold transition-colors w-full sm:w-auto text-sm sm:text-base">
-                Buy Detailed Report - $49
-              </button>
+              
+              {/* Email input and purchase button */}
+              <div className="mt-6 space-y-4">
+                <div className="max-w-md">
+                  <label className="block text-sm font-medium mb-2">Email for report delivery</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-600 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
+                  />
+                </div>
+                <button 
+                  onClick={handlePurchase}
+                  disabled={checkoutLoading || !email || !results}
+                  className="bg-white text-purple-900 hover:bg-slate-100 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed px-8 py-3 rounded-lg font-semibold transition-colors"
+                >
+                  {checkoutLoading ? 'Redirecting to checkout...' : 'Buy Detailed Report - $49'}
+                </button>
+                <p className="text-xs text-slate-400">
+                  Secure payment via Stripe. Report delivered within 2 minutes.
+                </p>
+              </div>
             </div>
           </div>
         )}

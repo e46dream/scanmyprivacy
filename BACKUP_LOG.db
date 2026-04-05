@@ -901,3 +901,38 @@ NOTES: |
     bash backup.sh restore ebdae57
 
 #===============================================================================
+
+#===============================================================================
+# BACKUP-028: PrivacyScan architecture - scanner + server + supabase
+#===============================================================================
+ID: BACKUP-028
+TIMESTAMP: 2026-04-05 21:43:55
+GIT_HASH: 6cbf36a
+AUTHOR: ScanMyPrivacy Developer
+TAGS: ENHANCEMENT
+
+CHANGES:
+  [ADDED] PrivacyScan architecture - scanner + server + supabase
+  
+FILES_AFFECTED: 7 files
+    - .env.api.example
+  - api/scanner.js
+  - api/server.js
+  - debug.log
+  - next.config.ts
+  - package-api.json
+  - supabase-schema.sql
+
+RESTORE_CMD: git reset --hard 6cbf36a
+
+STATUS: ACTIVE
+
+NOTES: |
+  Backup created at 2026-04-05 21:43:55
+  Commit hash: 6cbf36a
+  Files changed: 7
+  
+  TO RESTORE:
+    bash backup.sh restore 6cbf36a
+
+#===============================================================================

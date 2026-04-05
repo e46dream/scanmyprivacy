@@ -102,6 +102,66 @@ app.post(
 app.use(express.json())
 
 // ---------------------------------------------------------------------------
+// Free scan endpoint (for frontend)
+// ---------------------------------------------------------------------------
+app.get('/scan', async (req, res) => {
+  const { url } = req.query
+  
+  if (!url) {
+    return res.status(400).json({ error: 'URL is required' })
+  }
+
+  try {
+    const results = await runScan(url)
+    res.json(results)
+  } catch (err) {
+    console.error('Scan error:', err)
+    res.status(500).json({ error: 'Scan failed', message: err.message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Create Stripe checkout session (for frontend)
+// ---------------------------------------------------------------------------
+app.post('/create-checkout', async (req, res) => {
+  const { targetUrl, userEmail, userId } = req.body
+  
+  if (!targetUrl || !userEmail) {
+    return res.status(400).json({ error: 'URL and email are required' })
+  }
+
+  try {
+    const session = await stripe.checkout.sessions.create({
+      mode: 'payment',
+      line_items: [{
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: 'Privacy Compliance Report',
+            description: `Full GDPR/CCPA audit for ${new URL(targetUrl).hostname}`,
+          },
+          unit_amount: 4900, // $49.00
+        },
+        quantity: 1,
+      }],
+      metadata: {
+        targetUrl,
+        userEmail,
+        userId: userId || '',
+      },
+      customer_email: userEmail,
+      success_url: `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/payment/cancel`,
+    })
+
+    res.json({ url: session.url })
+  } catch (err) {
+    console.error('Checkout error:', err)
+    res.status(500).json({ error: 'Failed to create checkout session' })
+  }
+})
+
+// ---------------------------------------------------------------------------
 // Report download URL
 // ---------------------------------------------------------------------------
 app.get('/report/:scanId', async (req, res) => {
