@@ -1,0 +1,24 @@
+{
+  "name": "privacyscan-api",
+  "version": "1.0.0",
+  "description": "PrivacyScan compliance scanner API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node api/server.js",
+    "dev": "nodemon api/server.js",
+    "scan:test": "node -e \"const {runScan}=require('./api/scanner');runScan(process.argv[1]).then(r=>console.log(JSON.stringify(r.scoring,null,2)))\" https://example.com"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "express": "^4.18.2",
+    "playwright-chromium": "^1.42.0",
+    "resend": "^3.2.0",
+    "stripe": "^14.18.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
