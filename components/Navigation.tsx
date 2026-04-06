@@ -19,23 +19,23 @@ export default function Navigation() {
             </div>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
+            <div className="hidden md:flex items-center space-x-1">
               <div className="relative group">
                 <button className="text-slate-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">
                   Personal Scan
                 </button>
-                <div className="absolute left-0 mt-2 w-48 bg-slate-800 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-slate-700">
+                <div className="absolute left-0 mt-2 w-56 bg-slate-800 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-slate-700 z-50">
                   <Link href="/personal" className="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700 rounded-t-lg">
-                    Privacy Dashboard
+                    🔒 Privacy Dashboard
                   </Link>
                   <Link href="/personal/ip-leak" className="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700">
-                    IP Leak Test
+                    🕵️ IP Leak Test
                   </Link>
                   <Link href="/personal/fingerprint" className="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700">
-                    Browser Fingerprint
+                    👆 Browser Fingerprint
                   </Link>
                   <Link href="/personal/dns-leak" className="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700 rounded-b-lg">
-                    DNS Leak Check
+                    🔍 DNS Leak Check
                   </Link>
                 </div>
               </div>
@@ -44,22 +44,27 @@ export default function Navigation() {
                 <button className="text-slate-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">
                   Website Compliance
                 </button>
-                <div className="absolute left-0 mt-2 w-56 bg-slate-800 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-slate-700">
+                <div className="absolute left-0 mt-2 w-56 bg-slate-800 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-slate-700 z-50">
                   <Link href="/website" className="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700 rounded-t-lg">
-                    Website Scanner
+                    🌐 Website Scanner
                   </Link>
-                  <Link href="/pricing" className="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700">
-                    Pricing & Plans
+                  <Link href="/website/ecommerce" className="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700">
+                    🛒 E-Commerce Scan
                   </Link>
-                  <Link href="/website/ecommerce" className="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700 rounded-b-lg">
-                    For E-Commerce
+                  <Link href="/pricing" className="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700 rounded-b-lg">
+                    💰 Pricing & Plans
                   </Link>
                 </div>
               </div>
 
+              <Link href="/knowledgebase" className="text-slate-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">
+                Knowledgebase
+              </Link>
+
               <Link href="/blog" className="text-slate-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">
                 Blog
               </Link>
+
               <Link href="/tools" className="text-slate-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">
                 Tools
               </Link>
@@ -75,7 +80,7 @@ export default function Navigation() {
               </Link>
             </div>
 
-            {/* Mobile menu button with hover dropdown */}
+            {/* Mobile menu button */}
             <div className="md:hidden flex items-center relative group">
               <button
                 className="text-slate-300 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-colors"
@@ -86,50 +91,55 @@ export default function Navigation() {
                 </svg>
               </button>
               
-              {/* Floating Menu Items on Hover */}
-              <div className="absolute right-0 top-full mt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                <Link 
-                  href="/personal" 
-                  className="flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700/80 backdrop-blur-sm rounded-md transition-colors mb-0.5"
-                >
-                  <span>👤</span>
-                  <span>Personal</span>
-                </Link>
-                <Link 
-                  href="/website" 
-                  className="flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700/80 backdrop-blur-sm rounded-md transition-colors mb-0.5"
-                >
-                  <span>🌐</span>
-                  <span>Website</span>
-                </Link>
-                <Link 
-                  href="/pricing" 
-                  className="flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700/80 backdrop-blur-sm rounded-md transition-colors mb-0.5"
-                >
-                  <span>💰</span>
-                  <span>Pricing</span>
-                </Link>
-                <Link 
-                  href="/blog" 
-                  className="flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700/80 backdrop-blur-sm rounded-md transition-colors mb-0.5"
-                >
-                  <span>📝</span>
-                  <span>Blog</span>
-                </Link>
-                <div className="mt-1 space-y-0.5">
-                  <Link 
-                    href="/personal"
-                    className="flex items-center justify-center space-x-1 w-24 bg-blue-600/90 hover:bg-blue-700 text-white py-1 px-2 rounded font-medium transition-colors text-xs backdrop-blur-sm"
-                  >
-                    <span>👤</span>
-                    <span>Scan</span>
+              {/* Mobile Menu */}
+              <div className="absolute right-0 top-full mt-2 w-64 bg-slate-800 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-slate-700 z-50 p-2">
+                <div className="space-y-1">
+                  <p className="text-xs text-slate-500 px-3 py-1 uppercase tracking-wider">Personal</p>
+                  <Link href="/personal" className="block px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700 rounded-md">
+                    Privacy Dashboard
                   </Link>
+                  <Link href="/personal/ip-leak" className="block px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700 rounded-md">
+                    IP Leak Test
+                  </Link>
+                  <Link href="/personal/fingerprint" className="block px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700 rounded-md">
+                    Browser Fingerprint
+                  </Link>
+                  <Link href="/personal/dns-leak" className="block px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700 rounded-md">
+                    DNS Leak Check
+                  </Link>
+                </div>
+                <div className="border-t border-slate-700 my-2"></div>
+                <div className="space-y-1">
+                  <p className="text-xs text-slate-500 px-3 py-1 uppercase tracking-wider">Business</p>
+                  <Link href="/website" className="block px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700 rounded-md">
+                    Website Scanner
+                  </Link>
+                  <Link href="/website/ecommerce" className="block px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700 rounded-md">
+                    E-Commerce Scan
+                  </Link>
+                  <Link href="/pricing" className="block px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700 rounded-md">
+                    Pricing
+                  </Link>
+                </div>
+                <div className="border-t border-slate-700 my-2"></div>
+                <div className="space-y-1">
+                  <p className="text-xs text-slate-500 px-3 py-1 uppercase tracking-wider">Resources</p>
+                  <Link href="/knowledgebase" className="block px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700 rounded-md">
+                    Knowledgebase
+                  </Link>
+                  <Link href="/blog" className="block px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700 rounded-md">
+                    Blog
+                  </Link>
+                  <Link href="/tools" className="block px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700 rounded-md">
+                    Tools
+                  </Link>
+                </div>
+                <div className="border-t border-slate-700 my-2 pt-2">
                   <Link 
                     href="/website"
-                    className="flex items-center justify-center space-x-1 w-24 bg-purple-600/90 hover:bg-purple-700 text-white py-1 px-2 rounded font-medium transition-colors text-xs backdrop-blur-sm"
+                    className="block w-full text-center bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg text-sm font-semibold"
                   >
-                    <span>🌐</span>
-                    <span>Audit</span>
+                    Scan Website →
                   </Link>
                 </div>
               </div>

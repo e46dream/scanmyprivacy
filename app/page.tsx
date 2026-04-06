@@ -185,6 +185,89 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Data Retention & Privacy Promise */}
+      <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-slate-900 border-y border-slate-700">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-3">Your Data, Your Control</h2>
+            <p className="text-slate-400 max-w-2xl mx-auto">
+              We practice what we preach. Our data retention policies are transparent and minimal.
+            </p>
+          </div>
+          
+          <div className="grid sm:grid-cols-2 gap-6">
+            {/* Personal Scanner Data */}
+            <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
+              <h3 className="text-lg font-semibold text-blue-400 mb-4 flex items-center gap-2">
+                <span>👤</span> Personal Privacy Scanner
+              </h3>
+              <ul className="space-y-3 text-sm text-slate-400">
+                <li className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>No personal data stored on our servers</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Scan results stored locally on your device only</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Local storage auto-deletes after 24 hours</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>You can clear data anytime via browser settings</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Website Scanner Data */}
+            <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
+              <h3 className="text-lg font-semibold text-purple-400 mb-4 flex items-center gap-2">
+                <span>🌐</span> Website Compliance Scanner
+              </h3>
+              <ul className="space-y-3 text-sm text-slate-400">
+                <li className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Scan reports retained for 30 days</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Email addresses retained while account active</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Payment data: Never stored (handled by Stripe)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Delete account anytime - data removed within 48hrs</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="mt-8 text-center">
+            <p className="text-xs text-slate-500 mb-4">
+              Full Privacy Policy and Terms & Conditions available upon request for legal review.
+            </p>
+            <div className="flex justify-center gap-4 text-sm">
+              <Link href="/privacy-policy" className="text-blue-400 hover:text-blue-300 underline">
+                Privacy Policy
+              </Link>
+              <span className="text-slate-600">•</span>
+              <Link href="/terms" className="text-blue-400 hover:text-blue-300 underline">
+                Terms of Service
+              </Link>
+              <span className="text-slate-600">•</span>
+              <Link href="/data-retention" className="text-blue-400 hover:text-blue-300 underline">
+                Data Retention Details
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="border-t border-slate-700 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">

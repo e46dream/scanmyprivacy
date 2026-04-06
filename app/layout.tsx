@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import NewsTicker from '@/components/NewsTicker'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://scanmyprivacy.com'),
@@ -89,6 +90,7 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
+        <NewsTicker />
         {children}
       </body>
     </html>

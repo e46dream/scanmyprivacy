@@ -43,17 +43,53 @@ const KNOWN_TRACKERS = {
 
 // Known consent management platforms (CMP) — DOM selectors
 const CMP_SIGNATURES = [
-  '#CybotCookiebotDialog',          // Cookiebot
-  '.cky-consent-container',         // CookieYes
-  '#onetrust-banner-sdk',           // OneTrust
-  '#usercentrics-root',             // Usercentrics
-  '.cc-banner',                     // Cookie Consent by Osano
-  '#cookie-law-info-bar',           // Cookie Law Info (WP)
-  '.cookie-notice-container',       // Cookie Notice (WP)
-  '[id*="cookie"][id*="consent"]',  // Generic pattern
+  // Major CMP platforms
+  '#cookie-banner',               // Generic
+  '#cookie-consent',              // Generic
+  '#cookie-notice',               // Generic
+  '#gdpr-banner',                 // Generic
+  '#consent-banner',              // Generic
+  '.cookie-banner',               // Generic
+  '.cookie-consent',              // Generic
+  '.cookie-notice',               // Generic
+  '.gdpr-banner',                 // Generic
+  '.consent-banner',              // Generic
+  
+  // Specific CMP platforms
+  '#onetrust-banner-sdk',         // OneTrust
+  '#onetrust-consent-sdk',        // OneTrust
+  '.ot-sdk-container',            // OneTrust
+  '[data-testid="cookie-banner"]', // OneTrust
+  '#cookiebot',                   // Cookiebot
+  '.Cookiebot',                   // Cookiebot
+  '#cky-consent',                 // CookieYes
+  '.cky-consent',                 // CookieYes
+  '#usercentrics-root',           // Usercentrics
+  '.usercentrics-root',           // Usercentrics
+  '#cc-banner',                   // Cookie Consent by Osano
+  '.cc-banner',                   // Cookie Consent by Osano
+  '#cookie-law-info-bar',         // Cookie Law Info (WP)
+  '.cookie-notice-container',     // Cookie Notice (WP)
+  
+  // UK/EU specific patterns
+  '#cookie-policy',              // UK sites
+  '.cookie-policy',              // UK sites
+  '#privacy-notice',             // UK sites
+  '.privacy-notice',             // UK sites
+  '[role="dialog"][aria-label*="cookie"]', // Accessibility patterns
+  '[role="alertdialog"][aria-label*="consent"]',
+  
+  // Generic patterns
+  '[id*="cookie"][id*="consent"]',
   '[class*="cookie"][class*="banner"]',
   '[class*="gdpr"]',
   '[id*="gdpr"]',
+  '[data-cc*]',                  // Cookie Consent
+  '[data-consent*]',
+  '[data-cookie*]',
+  
+  // Text-based detection (will be checked in content)
+  // These are handled in the text analysis part
 ]
 
 // Privacy policy link patterns
@@ -65,6 +101,15 @@ const PRIVACY_LINK_PATTERNS = [
   /privacy notice/i,
   /data protection/i,
   /cookie policy/i,
+  // UK specific patterns
+  /privacy[\s-_]?and[\s-_]?cookies/i,
+  /cookies[\s-_]?policy/i,
+  /cookie[\s-_]?information/i,
+  /cookie[\s-_]?settings/i,
+  /your[\s-_]?privacy/i,
+  /privacy[\s-_]?hub/i,
+  /privacy[\s-_]?centre/i,
+  /privacy[\s-_]?statement/i,
 ]
 
 // US-based tracker domains (for data transfer warnings)
@@ -160,6 +205,7 @@ async function checkCookies(page) {
       httpOnly:   cookie.httpOnly,
       secure:     cookie.secure,
       sameSite:   cookie.sameSite,
+      value:      cookie.value ? `${cookie.value.substring(0, 50)}${cookie.value.length > 50 ? '...' : ''}` : '', // First 50 chars
       category:   tracker ? tracker[1].category : 'necessary',
       provider:   tracker ? tracker[1].name : domain,
       risk:       tracker ? tracker[1].risk : 'low',
@@ -217,6 +263,8 @@ async function checkTrackers(page) {
             domain:       trackerDomain,
             requestUrl:   url,
             resourceType: request.resourceType(),
+            method:       request.method(),
+            headers:      Object.keys(request.headers()).slice(0, 5), // First 5 headers
           })
         }
       }
@@ -256,6 +304,7 @@ async function checkTrackers(page) {
 async function checkConsentBanner(page) {
   let bannerFound = false
   let bannerSelector = null
+  let bannerType = null
 
   for (const selector of CMP_SIGNATURES) {
     const element = await page.$(selector)
@@ -264,6 +313,15 @@ async function checkConsentBanner(page) {
       if (visible) {
         bannerFound   = true
         bannerSelector = selector
+        
+        // Identify CMP type
+        if (selector.includes('cookiebot')) bannerType = 'Cookiebot'
+        else if (selector.includes('cky')) bannerType = 'CookieYes'
+        else if (selector.includes('onetrust')) bannerType = 'OneTrust'
+        else if (selector.includes('usercentrics')) bannerType = 'Usercentrics'
+        else if (selector.includes('cc-banner')) bannerType = 'Osano'
+        else bannerType = 'Generic'
+        
         break
       }
     }
@@ -272,8 +330,31 @@ async function checkConsentBanner(page) {
   // Also check for common banner text patterns in page body
   if (!bannerFound) {
     const bodyText = await page.evaluate(() => document.body.innerText.toLowerCase())
-    const bannerKeywords = ['we use cookies', 'cookie policy', 'accept cookies', 'consent']
+    const bannerKeywords = [
+      // English
+      'we use cookies', 
+      'cookie policy', 
+      'accept cookies', 
+      'consent',
+      'privacy preferences',
+      'cookie settings',
+      'manage cookies',
+      'your choices',
+      'personalise your experience',
+      'personalize your experience',
+      // UK specific
+      'cookie notice',
+      'privacy and cookies',
+      'cookies on our website',
+      'our use of cookies',
+      'cookie information',
+      // EU specific
+      'gdpr consent',
+      'data protection',
+      'privacy statement'
+    ]
     bannerFound = bannerKeywords.some(kw => bodyText.includes(kw))
+    if (bannerFound) bannerType = 'Text-based'
   }
 
   return {
@@ -282,10 +363,15 @@ async function checkConsentBanner(page) {
     pass:     bannerFound,
     severity: bannerFound ? 'pass' : 'critical',
     detail:   bannerFound
-      ? `Consent mechanism detected${bannerSelector ? ` (${bannerSelector})` : ''}.` 
+      ? `Consent mechanism detected${bannerSelector ? ` (${bannerType})` : ''}.` 
       : 'No cookie consent banner detected. Cookies may be set without user knowledge.',
     gdprArticle: 'GDPR Article 7 + ePrivacy Directive Article 5(3)',
     fix: bannerFound ? null : 'Add a consent management platform: CookieYes (free tier available), Cookiebot, or Osano. Ensure it blocks non-essential cookies until consent is given.',
+    data: {
+      bannerFound,
+      bannerSelector,
+      bannerType,
+    },
   }
 }
 
@@ -309,6 +395,7 @@ async function checkPrivacyPolicy(page) {
 
   let policyPageValid = false
   let policyContent   = null
+  let gdprMentions   = []
 
   if (privacyLink?.href) {
     try {
@@ -316,12 +403,19 @@ async function checkPrivacyPolicy(page) {
       if (response.ok()) {
         policyContent    = await response.text()
         const lcContent  = policyContent.toLowerCase()
-        policyPageValid  = (
-          lcContent.includes('gdpr') ||
-          lcContent.includes('data controller') ||
-          lcContent.includes('personal data') ||
-          lcContent.includes('data protection')
-        )
+        
+        // Check for specific GDPR mentions
+        gdprMentions = [
+          lcContent.includes('gdpr') ? 'GDPR' : null,
+          lcContent.includes('data controller') ? 'Data Controller' : null,
+          lcContent.includes('personal data') ? 'Personal Data' : null,
+          lcContent.includes('data protection') ? 'Data Protection' : null,
+          lcContent.includes('data subject rights') ? 'Data Subject Rights' : null,
+          lcContent.includes('lawful basis') ? 'Lawful Basis' : null,
+          lcContent.includes('data retention') ? 'Data Retention' : null,
+        ].filter(Boolean)
+        
+        policyPageValid  = gdprMentions.length >= 2 // At least 2 GDPR concepts mentioned
       }
     } catch {
       // Page fetch failed
@@ -337,8 +431,8 @@ async function checkPrivacyPolicy(page) {
     severity: pass ? (policyPageValid ? 'pass' : 'warning') : 'critical',
     detail:   pass
       ? policyPageValid
-        ? `Privacy policy found at ${privacyLink.href} — mentions GDPR/personal data.` 
-        : `Privacy policy link found but content may be incomplete.` 
+        ? `Privacy policy found at ${privacyLink.href} — mentions ${gdprMentions.join(', ')}.` 
+        : `Privacy policy link found but content may be incomplete.`
       : 'No privacy policy link found in page links.',
     gdprArticle: 'GDPR Article 13 — Information to be provided',
     fix: pass ? null : 'Add a /privacy page covering: data collected, legal basis, retention periods, data controller identity, and user rights. Link it in your site footer.',
@@ -346,6 +440,8 @@ async function checkPrivacyPolicy(page) {
       linkFound:     !!privacyLink,
       linkUrl:       privacyLink?.href || null,
       contentValid:  policyPageValid,
+      gdprMentions,
+      wordCount: policyContent ? policyContent.split(/\s+/).length : 0,
     },
   }
 }
@@ -356,8 +452,8 @@ async function checkPrivacyPolicy(page) {
  */
 async function checkForms(page) {
   const formResults = await page.evaluate(() => {
-    const personalFieldTypes  = ['email', 'tel', 'text']
-    const personalFieldNames  = /name|email|phone|address|postcode|zip|dob|birth/i
+    const personalFieldTypes  = ['email', 'tel', 'text', 'password', 'search', 'url']
+    const personalFieldNames  = /name|email|phone|address|postcode|zip|dob|birth|ssn|passport|credit|card|bank|account|username|password/i
     const consentPatterns     = /consent|agree|privacy|terms|gdpr/i
 
     return Array.from(document.querySelectorAll('form')).map((form, i) => {
@@ -365,7 +461,8 @@ async function checkForms(page) {
       const isPersonal = inputs.some(input =>
         personalFieldTypes.includes(input.type) ||
         personalFieldNames.test(input.name) ||
-        personalFieldNames.test(input.id)
+        personalFieldNames.test(input.id) ||
+        personalFieldNames.test(input.placeholder || '')
       )
 
       if (!isPersonal) return null
@@ -380,12 +477,27 @@ async function checkForms(page) {
       const formText      = form.innerText?.toLowerCase() || ''
       const mentionsPrivacy = /privacy|gdpr|data protection|consent/i.test(formText)
 
+      // Analyze input fields
+      const fieldAnalysis = inputs
+        .filter(input => personalFieldTypes.includes(input.type) || personalFieldNames.test(input.name) || personalFieldNames.test(input.id))
+        .map(input => ({
+          name: input.name || input.id || 'unnamed',
+          type: input.type,
+          required: input.required,
+          placeholder: input.placeholder || '',
+          hasLabel: !!input.closest('label')?.innerText
+        }))
+
       return {
         formIndex:      i,
+        action:        form.action || form.getAttribute('action') || '',
+        method:        form.method || 'GET',
+        fieldCount:     fieldAnalysis.length,
         hasConsentBox:  !!consentBox,
         hasPrivacyLink: !!privacyLink,
         mentionsPrivacy,
         compliant:      (!!consentBox || mentionsPrivacy) && !!privacyLink,
+        fields:        fieldAnalysis,
       }
     }).filter(Boolean)
   })
@@ -406,7 +518,15 @@ async function checkForms(page) {
         : `${nonCompliant} of ${personalForms} form(s) missing consent checkbox or privacy link.`,
     gdprArticle: 'GDPR Article 6 — Lawfulness of processing',
     fix: pass ? null : 'Add a checkbox to each form: "I have read and agree to the Privacy Policy [link]". The checkbox must be unchecked by default.',
-    data: { forms: formResults },
+    data: { 
+      forms: formResults,
+      summary: {
+        totalForms: personalForms,
+        compliantForms: personalForms - nonCompliant,
+        nonCompliantForms: nonCompliant,
+        totalFields: formResults.reduce((sum, f) => sum + f.fieldCount, 0),
+      }
+    },
   }
 }
 
@@ -463,12 +583,40 @@ async function runScan(targetUrl) {
   // Set up tracker listener BEFORE navigation (captures all requests)
   const trackerCheck = checkTrackers(page)
 
+  // Set realistic user agent to avoid blocking
+  await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+  await page.setExtraHTTPHeaders({
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+  })
+
   let navigationError = null
   try {
-    await page.goto(targetUrl, {
-      waitUntil: 'networkidle', // Wait for all requests to settle
-      timeout:   30000,
+    // Navigate to target URL
+    const response = await page.goto(targetUrl, { 
+      waitUntil: 'networkidle',
+      timeout: 30000 
     })
+    
+    if (!response?.ok()) {
+      if (response?.status() === 403) {
+        throw new Error(`Access denied (403). The website is blocking automated scans.`)
+      } else if (response?.status() === 301 || response?.status() === 302) {
+        const location = response.headers()['location']
+        if (location) {
+          // Follow redirect
+          await page.goto(location, { 
+            waitUntil: 'networkidle',
+            timeout: 30000 
+          })
+        }
+      } else {
+        throw new Error(`Failed to load ${targetUrl}: ${response?.status()}`)
+      }
+    }
+
+    // Wait a bit for dynamic content to load
+    await page.waitForTimeout(2000)
   } catch (err) {
     navigationError = err.message
   }
