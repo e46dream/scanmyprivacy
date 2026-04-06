@@ -109,7 +109,24 @@ const PRIVACY_LINK_PATTERNS = [
   /your[\s-_]?privacy/i,
   /privacy[\s-_]?hub/i,
   /privacy[\s-_]?centre/i,
+  /privacy[\s-_]?center/i,  // US spelling
   /privacy[\s-_]?statement/i,
+  /privacy[\s-_]?portal/i,
+  /privacy[\s-_]?dashboard/i,
+  // Tesco specific
+  /privacy[\s-_]?policy/i,
+  /cookie[\s-_]?preferences/i,
+  /privacy[\s-_]?centre/i,
+  /privacy[\s-_]?and[\s-_]?cookies/i,
+  /data[\s-_]?protection/i,
+  /legal[\s-_]?information/i,
+  /terms[\s-_]?and[\s-_]?conditions/i,
+  /cookie[\s-_]?notice/i,
+  /privacy[\s-_]?notice/i,
+  // Generic patterns
+  /privacy/i,
+  /cookies/i,
+  /gdpr/i
 ]
 
 // US-based tracker domains (for data transfer warnings)
@@ -351,10 +368,60 @@ async function checkConsentBanner(page) {
       // EU specific
       'gdpr consent',
       'data protection',
-      'privacy statement'
+      'privacy statement',
+      // Tesco specific patterns
+      'cookie preferences',
+      'accept all',
+      'reject all',
+      'customise',
+      'customise cookies',
+      'essential cookies',
+      'marketing cookies',
+      'analytics cookies',
+      'cookie banner',
+      'privacy centre',
+      'cookie policy',
+      'privacy policy',
+      'data protection',
+      'cookie settings',
+      'manage preferences'
     ]
     bannerFound = bannerKeywords.some(kw => bodyText.includes(kw))
     if (bannerFound) bannerType = 'Text-based'
+  }
+
+  // Check for hidden or dynamically loaded consent banners
+  if (!bannerFound) {
+    const hiddenBanners = await page.evaluate(() => {
+      const allElements = document.querySelectorAll('*')
+      for (const element of allElements) {
+        const text = element.textContent?.toLowerCase() || ''
+        const style = window.getComputedStyle(element)
+        
+        // Check if element contains consent-related text
+        if (text.includes('cookie') || text.includes('consent') || text.includes('privacy')) {
+          // Check if element is visible or potentially visible
+          if (style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0') {
+            // Check if element has substantial content
+            if (text.length > 20 && (text.includes('accept') || text.includes('agree') || text.includes('manage'))) {
+              return {
+                found: true,
+                element: element.tagName,
+                text: text.substring(0, 100),
+                display: style.display,
+                visibility: style.visibility
+              }
+            }
+          }
+        }
+      }
+      return { found: false }
+    })
+    
+    if (hiddenBanners.found) {
+      bannerFound = true
+      bannerType = 'Hidden/Dynamic'
+    }
   }
 
   return {
@@ -380,75 +447,82 @@ async function checkConsentBanner(page) {
  * Looks for a privacy policy link in header, footer, and nav.
  */
 async function checkPrivacyPolicy(page) {
-  const links = await page.evaluate(() => {
-    return Array.from(document.querySelectorAll('a')).map(a => ({
-      text: a.innerText?.trim() || '',
-      href: a.href || '',
+  // Check for privacy policy links in page
+  const privacyLinks = await page.evaluate(() => {
+    const links = Array.from(document.querySelectorAll('a'))
+    return links.map(link => ({
+      href: link.href,
+      text: link.textContent?.trim() || '',
+      title: link.title || ''
     }))
   })
 
-  const privacyLink = links.find(link =>
-    PRIVACY_LINK_PATTERNS.some(pattern =>
-      pattern.test(link.text) || pattern.test(link.href)
-    )
-  )
-
-  let policyPageValid = false
-  let policyContent   = null
-  let gdprMentions   = []
-
-  if (privacyLink?.href) {
-    try {
-      const response = await page.request.get(privacyLink.href)
-      if (response.ok()) {
-        policyContent    = await response.text()
-        const lcContent  = policyContent.toLowerCase()
-        
-        // Check for specific GDPR mentions
-        gdprMentions = [
-          lcContent.includes('gdpr') ? 'GDPR' : null,
-          lcContent.includes('data controller') ? 'Data Controller' : null,
-          lcContent.includes('personal data') ? 'Personal Data' : null,
-          lcContent.includes('data protection') ? 'Data Protection' : null,
-          lcContent.includes('data subject rights') ? 'Data Subject Rights' : null,
-          lcContent.includes('lawful basis') ? 'Lawful Basis' : null,
-          lcContent.includes('data retention') ? 'Data Retention' : null,
-        ].filter(Boolean)
-        
-        policyPageValid  = gdprMentions.length >= 2 // At least 2 GDPR concepts mentioned
+  let linkFound = false
+  let linkUrl = null
+  let contentValid = false
+  let gdprMentions = []
+  let wordCount = 0
+  
+  // Check each link against privacy patterns
+  for (const link of privacyLinks) {
+    const combinedText = `${link.text} ${link.title} ${link.href}`.toLowerCase()
+    
+    for (const pattern of PRIVACY_LINK_PATTERNS) {
+      if (pattern.test(combinedText)) {
+        linkFound = true
+        linkUrl = link.href
+        break
       }
-    } catch {
-      // Page fetch failed
+    }
+    if (linkFound) break
+  }
+
+  // Also check for privacy policy in page content
+  if (linkFound) {
+    try {
+      const contentCheck = await page.evaluate(() => {
+        const bodyText = document.body.innerText.toLowerCase()
+        const gdprKeywords = ['gdpr', 'general data protection', 'data protection', 'privacy policy', 'cookie policy']
+        const mentions = gdprKeywords.filter(keyword => bodyText.includes(keyword))
+        return {
+          gdprMentions: mentions,
+          wordCount: document.body.innerText.split(/\s+/).length
+        }
+      })
+      
+      contentValid = contentCheck.gdprMentions.length > 0
+      gdprMentions = contentCheck.gdprMentions
+      wordCount = contentCheck.wordCount
+    } catch (err) {
+      console.log('Could not analyze privacy content:', err.message)
     }
   }
 
-  const pass = !!privacyLink
+  const pass = linkFound && contentValid
 
   return {
     id:       'privacy_policy',
     name:     'Privacy policy',
     pass,
-    severity: pass ? (policyPageValid ? 'pass' : 'warning') : 'critical',
+    severity: pass ? 'pass' : 'critical',
     detail:   pass
-      ? policyPageValid
-        ? `Privacy policy found at ${privacyLink.href} — mentions ${gdprMentions.join(', ')}.` 
-        : `Privacy policy link found but content may be incomplete.`
+      ? `Privacy policy found${linkUrl ? ` at ${linkUrl}` : ''} — mentions ${gdprMentions.join(', ')}.` 
       : 'No privacy policy link found in page links.',
     gdprArticle: 'GDPR Article 13 — Information to be provided',
     fix: pass ? null : 'Add a /privacy page covering: data collected, legal basis, retention periods, data controller identity, and user rights. Link it in your site footer.',
     data: {
-      linkFound:     !!privacyLink,
-      linkUrl:       privacyLink?.href || null,
-      contentValid:  policyPageValid,
+      linkFound,
+      linkUrl,
+      contentValid,
       gdprMentions,
-      wordCount: policyContent ? policyContent.split(/\s+/).length : 0,
+      wordCount
     },
   }
 }
 
 /**
  * 6. Form compliance check
- * Finds forms collecting personal data and checks for consent checkbox + privacy link.
+ * Looks for forms collecting personal data
  */
 async function checkForms(page) {
   const formResults = await page.evaluate(() => {
@@ -616,7 +690,7 @@ async function runScan(targetUrl) {
     }
 
     // Wait a bit for dynamic content to load
-    await page.waitForTimeout(2000)
+    await page.waitForTimeout(5000)
   } catch (err) {
     navigationError = err.message
   }

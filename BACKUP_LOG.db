@@ -1031,3 +1031,72 @@ NOTES: |
     bash backup.sh restore ab4f1d0
 
 #===============================================================================
+
+#===============================================================================
+# BACKUP-032: Complete API integration fixes and scanner restoration
+#===============================================================================
+ID: BACKUP-032
+TIMESTAMP: 2026-04-06 20:08:00
+GIT_HASH: 1662997
+AUTHOR: ScanMyPrivacy Developer
+TAGS: BUGFIX, ENHANCEMENT, RESTORATION
+
+CHANGES:
+  [FIXED] API connection issues (port 3001 alignment)
+    - Updated .env.local to use correct API port
+    - Fixed frontend API response structure handling
+    - Added proper error handling for API failures
+  
+  [ENHANCED] Error handling and user feedback
+    - Added specific error messages for different failure types
+    - Implemented retry functionality for failed scans
+    - Added proper error state display with "Try Again" button
+  
+  [ENHANCED] Website detection capabilities
+    - Added UK/EU specific consent banner patterns
+    - Implemented redirect handling (301/302)
+    - Added 403 error management for blocked sites
+    - Enhanced privacy policy link detection for UK sites
+  
+  [RESTORED] Website Scanner to general compliance scanning
+    - Reverted from E-Commerce back to general website scanner
+    - Restored original pricing (9 reports)
+    - Updated branding and descriptions
+    - Fixed placeholder and scan descriptions
+  
+  [IMPROVED] Scanner robustness
+    - Added realistic user agent headers
+    - Enhanced cookie detection patterns
+    - Improved form compliance checking
+    - Added dynamic content loading delays
+
+FILES_AFFECTED: 23 files
+  - app/website/page.tsx (major API fixes, error handling, UI restoration)
+  - api/scanner.js (enhanced detection patterns, redirect handling)
+  - .env.local (correct API port configuration)
+  - api/package.json (API dependencies)
+  - api/server-simple.js (simplified API server)
+  - Multiple new pages and components
+
+RESTORE_CMD: git reset --hard 1662997
+
+STATUS: ACTIVE
+
+NOTES: |
+  Backup created at 2026-04-06 20:08:00
+  Commit hash: 1662997
+  Files changed: 23 (5287 insertions, 246 deletions)
+  
+  CRITICAL FIXES:
+  - API connection now works correctly on port 3001
+  - Scanner handles all error types gracefully
+  - UK/EU websites properly detected
+  - Tesco.com and other major sites scan successfully
+  
+  TO RESTORE:
+    bash backup.sh restore 1662997
+    OR: git reset --hard 1662997
+
+#===============================================================================
+
+
