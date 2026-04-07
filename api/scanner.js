@@ -176,22 +176,44 @@ async function getBrowser() {
 
 /**
  * 1. HTTPS check
- * Verifies the site uses HTTPS and doesn't redirect to HTTP.
+ * Verifies the site uses HTTPS and detects redirects
  */
-function checkHttps(url) {
-  const parsed = new URL(url)
-  const isHttps = parsed.protocol === 'https:'
+function checkHttps(originalUrl, finalUrl, redirectOccurred) {
+  const originalParsed = new URL(originalUrl)
+  const finalParsed = new URL(finalUrl)
+  
+  const originalIsHttps = originalParsed.protocol === 'https:'
+  const finalIsHttps = finalParsed.protocol === 'https:'
+  
+  // If user entered http:// but got redirected to https://, that's good
+  const userEnteredHttp = originalParsed.protocol === 'http:'
+  const redirectedToHttps = userEnteredHttp && finalIsHttps && redirectOccurred
+  
+  console.log('Debug HTTPS check:', {
+    originalUrl,
+    finalUrl,
+    redirectOccurred,
+    originalIsHttps,
+    finalIsHttps,
+    userEnteredHttp,
+    redirectedToHttps
+  })
+  
+  // Pass if final URL is HTTPS, or if user entered HTTP and got redirected to HTTPS
+  const isSecure = finalIsHttps || redirectedToHttps
 
   return {
     id: 'https',
     name: 'HTTPS enforcement',
-    pass: isHttps,
-    severity: isHttps ? 'pass' : 'critical',
-    detail: isHttps
-      ? 'Site is served over HTTPS.'
+    pass: isSecure,
+    severity: isSecure ? 'pass' : 'critical',
+    detail: isSecure
+      ? redirectedToHttps 
+        ? `Site automatically redirects HTTP to HTTPS (good security practice).`
+        : 'Site is served over HTTPS.'
       : 'Site is not using HTTPS. All data is transmitted in plain text.',
     gdprArticle: 'GDPR Article 32 — Security of processing',
-    fix: isHttps
+    fix: isSecure
       ? null
       : 'Enable HTTPS via your hosting provider or use Cloudflare (free). Redirect all HTTP traffic to HTTPS.',
   }
@@ -424,6 +446,90 @@ async function checkConsentBanner(page) {
     }
   }
 
+  // Try to trigger consent banners with common interactions
+  if (!bannerFound) {
+    try {
+      // Click on cookie settings links
+      await page.evaluate(() => {
+        const cookieLinks = Array.from(document.querySelectorAll('a')).filter(link => {
+          const text = link.textContent?.toLowerCase() || ''
+          return text.includes('cookie') || text.includes('privacy') || text.includes('preferences')
+        })
+        
+        // Click first cookie/privacy link to potentially trigger banner
+        if (cookieLinks.length > 0) {
+          cookieLinks[0].click()
+        }
+      })
+      
+      // Wait for potential banner to appear
+      await page.waitForTimeout(2000)
+      
+      // Check again for banners
+      const afterClickBanners = await page.evaluate(() => {
+        const bodyText = document.body.innerText.toLowerCase()
+        const bannerKeywords = ['accept all', 'reject all', 'cookie settings', 'manage cookies', 'consent']
+        return bannerKeywords.some(kw => bodyText.includes(kw))
+      })
+      
+      if (afterClickBanners) {
+        bannerFound = true
+        bannerType = 'Interaction-triggered'
+      }
+    } catch (err) {
+      console.log('Interaction attempt failed:', err.message)
+    }
+  }
+
+  // Check for iframe-based consent banners
+  if (!bannerFound) {
+    const iframeBanners = await page.evaluate(() => {
+      const iframes = document.querySelectorAll('iframe')
+      for (const iframe of iframes) {
+        try {
+          const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document
+          if (iframeDoc) {
+            const iframeText = iframeDoc.body.innerText.toLowerCase()
+            if (iframeText.includes('cookie') || iframeText.includes('consent')) {
+              return true
+            }
+          }
+        } catch (e) {
+          // Cross-origin iframe, can't access
+        }
+      }
+      return false
+    })
+    
+    if (iframeBanners) {
+      bannerFound = true
+      bannerType = 'Iframe-based'
+    }
+  }
+
+  // Try scrolling to trigger lazy-loaded consent banners
+  if (!bannerFound) {
+    try {
+      await page.evaluate(() => {
+        window.scrollTo(0, document.body.scrollHeight / 2)
+      })
+      await page.waitForTimeout(1000)
+      
+      const scrollBanners = await page.evaluate(() => {
+        const bodyText = document.body.innerText.toLowerCase()
+        const bannerKeywords = ['cookie', 'consent', 'privacy', 'accept all', 'reject all']
+        return bannerKeywords.some(kw => bodyText.includes(kw))
+      })
+      
+      if (scrollBanners) {
+        bannerFound = true
+        bannerType = 'Scroll-triggered'
+      }
+    } catch (err) {
+      console.log('Scroll attempt failed:', err.message)
+    }
+  }
+
   return {
     id:       'consent_banner',
     name:     'Cookie consent banner',
@@ -636,8 +742,11 @@ function calculateScore(checks) {
 // Main scan runner
 // ---------------------------------------------------------------------------
 async function runScan(targetUrl) {
-  // Normalise URL
-  if (!targetUrl.startsWith('http')) {
+  // Preserve original URL for redirect detection
+  const originalUserUrl = targetUrl
+  
+  // Only normalize if user didn't specify a protocol
+  if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
     targetUrl = 'https://' + targetUrl
   }
 
@@ -664,35 +773,42 @@ async function runScan(targetUrl) {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
   })
 
+  console.log('Debug: Starting scan for', originalUserUrl, 'normalized to', targetUrl)
+
   let navigationError = null
+  let originalUrl = targetUrl // Store original URL
+  let finalUrl = targetUrl      // Will be updated if redirect occurs
+  let redirectOccurred = false
+
   try {
-    // Navigate to target URL
+    // Navigate to target URL and track redirects
+    console.log('Debug: Navigating to', targetUrl)
+    
     const response = await page.goto(targetUrl, { 
       waitUntil: 'networkidle',
       timeout: 30000 
     })
     
+    // Get final URL after all redirects
+    finalUrl = page.url()
+    console.log('Debug: Final URL after navigation:', finalUrl)
+    
+    // Check if redirect occurred by comparing original and final URLs
+    if (originalUserUrl !== finalUrl) {
+      redirectOccurred = true
+      console.log('Debug: Redirect detected from', originalUserUrl, 'to', finalUrl)
+    }
+    
     if (!response?.ok()) {
       if (response?.status() === 403) {
         throw new Error(`Access denied (403). The website is blocking automated scans.`)
-      } else if (response?.status() === 301 || response?.status() === 302) {
-        const location = response.headers()['location']
-        if (location) {
-          // Follow redirect
-          await page.goto(location, { 
-            waitUntil: 'networkidle',
-            timeout: 30000 
-          })
-        }
       } else {
         throw new Error(`Failed to load ${targetUrl}: ${response?.status()}`)
       }
     }
-
-    // Wait a bit for dynamic content to load
-    await page.waitForTimeout(5000)
   } catch (err) {
     navigationError = err.message
+    console.log('Debug: Navigation error:', err.message)
   }
 
   // Run all checks in parallel where possible
@@ -710,7 +826,7 @@ async function runScan(targetUrl) {
     checkForms(page),
   ])
 
-  const httpsResult = checkHttps(targetUrl)
+  const httpsResult = checkHttps(originalUserUrl, finalUrl, redirectOccurred)
 
   await context.close()
   await browser.close()
@@ -724,9 +840,11 @@ async function runScan(targetUrl) {
 
   return {
     meta: {
-      url:           targetUrl,
-      scannedAt:     new Date().toISOString(),
-      durationMs:    Date.now() - startTime,
+      url: finalUrl,
+      originalUrl: originalUserUrl,
+      redirectOccurred,
+      scannedAt: new Date().toISOString(),
+      durationMs: Date.now() - startTime,
       scannerVersion:'1.0.0',
       navigationError,
     },

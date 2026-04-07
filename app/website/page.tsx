@@ -10,28 +10,67 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 export default function WebsitePage() {
   const [url, setUrl] = useState('');
   const [scanning, setScanning] = useState(false);
-  const [results, setResults] = useState<any>(null);
   const [email, setEmail] = useState('');
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [emailError, setEmailError] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'paypal' | 'upi'>('stripe');
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [results, setResults] = useState<any>(null);
+
+  const validateEmail = (email: string) => {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailPattern.test(email);
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEmail(value);
+    
+    if (value && !validateEmail(value)) {
+      setEmailError('Please enter a valid email address');
+    } else {
+      setEmailError('');
+    }
+  };
 
   const scanWebsite = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!url) return;
     
-    // Basic URL validation
-    const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
-    const isValidDomain = /^([\da-z\.-]+)\.([a-z\.]{2,6})$/;
-    const cleanUrl = url.trim().replace(/^https?:\/\//, '');
+    // Basic URL validation - proper but not too strict
+    const trimmedUrl = url.trim();
     
-    if (!isValidDomain.test(cleanUrl) && !urlPattern.test(url.trim())) {
+    console.log('Debug - URL entered:', trimmedUrl);
+    
+    // Basic checks
+    if (!trimmedUrl || trimmedUrl.length < 3) {
+      console.log('Debug - URL too short or empty');
       setResults({
         url,
-        error: 'Please enter a valid website URL (e.g., google.com or https://example.com)',
+        error: 'Please enter a website URL',
         demo: false
       });
       return;
     }
+    
+    // Check if it's a reasonable format
+    const hasDot = trimmedUrl.includes('.');
+    const startsWithHttp = trimmedUrl.startsWith('http');
+    
+    console.log('Debug - hasDot:', hasDot, 'startsWithHttp:', startsWithHttp);
+    
+    // If it starts with http, accept it
+    // If it doesn't start with http, it should have a dot
+    if (!startsWithHttp && !hasDot) {
+      console.log('Debug - URL validation failed');
+      setResults({
+        url,
+        error: 'Please enter a valid website URL (e.g., example.com or https://website.com)',
+        demo: false
+      });
+      return;
+    }
+    
+    console.log('Debug - URL validation passed');
     
     setScanning(true);
     setResults(null); // Clear previous results
@@ -123,7 +162,12 @@ export default function WebsitePage() {
   };
 
   const handlePurchase = async () => {
-    if (!email || !results) return;
+    if (!email || !validateEmail(email)) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+    
+    if (!results) return;
     
     setCheckoutLoading(true);
     
@@ -228,10 +272,10 @@ export default function WebsitePage() {
         <div className="bg-slate-800 rounded-xl p-4 sm:p-6 mb-4 sm:mb-6 border border-slate-700">
           <form onSubmit={scanWebsite} className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <input
-              type="url"
+              type="text"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://example.com"
+              placeholder="example.com or https://website.com"
               className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg bg-slate-900 border border-slate-600 text-white text-sm sm:text-base"
             />
             <button
@@ -348,10 +392,15 @@ export default function WebsitePage() {
                   <input
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={handleEmailChange}
                     placeholder="you@example.com"
-                    className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-600 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
+                    className={`w-full px-4 py-3 rounded-lg bg-slate-800 border text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 ${
+                      emailError ? 'border-red-500' : 'border-slate-600'
+                    }`}
                   />
+                  {emailError && (
+                    <p className="text-red-400 text-sm mt-1">{emailError}</p>
+                  )}
                 </div>
 
                 {/* Payment Methods */}
@@ -393,7 +442,7 @@ export default function WebsitePage() {
 
                 <button 
                   onClick={handlePurchase}
-                  disabled={checkoutLoading || !email || !results}
+                  disabled={checkoutLoading || !email || !validateEmail(email) || !results}
                   className="bg-white text-purple-900 hover:bg-slate-100 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed px-8 py-3 rounded-lg font-semibold transition-colors"
                 >
                   {checkoutLoading 
