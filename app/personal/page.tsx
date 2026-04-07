@@ -33,7 +33,7 @@ export default function PersonalPage() {
   useEffect(() => {
     // Set browser-specific states after mount to avoid hydration mismatch
     setIsSecure(window.location.protocol === 'https:');
-    setIsDoNotTrack(navigator.doNotTrack === '1' || navigator.globalPrivacyControl?.signal?.aborted === true);
+    setIsDoNotTrack(navigator.doNotTrack === '1');
     // Check for stored score first
     const storedScore = localStorage.getItem('privacyScore');
     const storedTimestamp = localStorage.getItem('privacyScoreTimestamp');
@@ -92,7 +92,7 @@ export default function PersonalPage() {
       }
 
       // 2. Do Not Track (-10)
-      const dntEnabled = navigator.doNotTrack === '1' || navigator.globalPrivacyControl?.signal?.aborted === true;
+      const dntEnabled = navigator.doNotTrack === '1';
       if (!dntEnabled) {
         currentScore -= 10;
         factors.push({ name: 'Do Not Track Disabled', value: -10, maxPenalty: 10 });
