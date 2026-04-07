@@ -33,7 +33,7 @@ export default function PersonalPage() {
   useEffect(() => {
     // Set browser-specific states after mount to avoid hydration mismatch
     setIsSecure(window.location.protocol === 'https:');
-    setIsDoNotTrack(navigator.doNotTrack === '1' || navigator.globalPrivacyControl === true);
+    setIsDoNotTrack(navigator.doNotTrack === '1' || navigator.globalPrivacyControl?.signal?.aborted === true);
     // Check for stored score first
     const storedScore = localStorage.getItem('privacyScore');
     const storedTimestamp = localStorage.getItem('privacyScoreTimestamp');
