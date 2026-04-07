@@ -92,7 +92,7 @@ export default function PersonalPage() {
       }
 
       // 2. Do Not Track (-10)
-      const dntEnabled = navigator.doNotTrack === '1' || navigator.globalPrivacyControl === true;
+      const dntEnabled = navigator.doNotTrack === '1' || navigator.globalPrivacyControl?.signal?.aborted === true;
       if (!dntEnabled) {
         currentScore -= 10;
         factors.push({ name: 'Do Not Track Disabled', value: -10, maxPenalty: 10 });
