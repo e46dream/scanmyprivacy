@@ -2,7 +2,7 @@
 
 import Navigation from '@/components/Navigation';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 const allVPNs = [
@@ -134,7 +134,7 @@ const getColorClasses = (color: string) => {
   return colors[color] || colors.blue;
 };
 
-export default function VPNRecommendationsPage() {
+function VPNRecommendationsContent() {
   const [score, setScore] = useState(0);
   const [loading, setLoading] = useState(true);
   const searchParams = useSearchParams();
@@ -367,5 +367,15 @@ export default function VPNRecommendationsPage() {
         </div>
       </main>
     </>
+  );
+}
+
+export default function VPNRecommendationsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="text-white">Loading...</div>
+    </div>}>
+      <VPNRecommendationsContent />
+    </Suspense>
   );
 }
