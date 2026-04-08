@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "node api/server-simple.js",
+    "start:frontend": "next start",
     "lint": "next lint"
   },
   "dependencies": {
