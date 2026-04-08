@@ -130,7 +130,7 @@ export default function WebsitePage() {
       };
       
       setResults(transformedResults);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Scan error:', err);
       // Show specific error messages based on error type
       let errorMessage = 'Scan failed. Please check the URL and try again.';
@@ -254,7 +254,7 @@ export default function WebsitePage() {
           throw new Error('No UPI order details returned');
         }
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Checkout error:', err);
       alert('Failed to start checkout. Please try again.');
       setCheckoutLoading(false);
