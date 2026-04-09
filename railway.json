@@ -17,7 +17,7 @@
     }
   },
   "deploy": {
-    "startCommand": "node api/server-simple.js",
+    "startCommand": "pwd && ls -la && ls -la node_modules 2>/dev/null | head -5 || echo 'NO NODE_MODULES' && npm install && node api/server-simple.js",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }
