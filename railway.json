@@ -8,7 +8,7 @@
           "nixPkgs": ["nodejs_22"]
         },
         "install": {
-          "cmds": []
+          "cmds": ["npm ci"]
         },
         "build": {
           "cmds": ["npx playwright install chromium && npx playwright install-deps chromium"]
@@ -17,7 +17,7 @@
     }
   },
   "deploy": {
-    "startCommand": "rm -rf node_modules package-lock.json && npm install && node api/server-simple.js",
+    "startCommand": "node api/server-simple.js",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }
