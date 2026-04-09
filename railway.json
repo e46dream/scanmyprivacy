@@ -8,10 +8,10 @@
           "nixPkgs": ["nodejs_22"]
         },
         "install": {
-          "cmds": ["npm ci"]
+          "cmds": ["rm -rf node_modules package-lock.json && npm install"]
         },
         "build": {
-          "cmds": []
+          "cmds": ["npx playwright install chromium", "npx playwright install-deps chromium"]
         }
       }
     }
