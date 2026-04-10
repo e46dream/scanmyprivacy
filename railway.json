@@ -1,7 +1,14 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "builder": "NIXPACKS"
+    "builder": "NIXPACKS",
+    "nixpacksPlan": {
+      "phases": {
+        "setup": {
+          "nixPkgs": ["nodejs_22"]
+        }
+      }
+    }
   },
   "deploy": {
     "startCommand": "pwd && ls -la && rm -rf node_modules && npm ci && ls -la node_modules | head -10 && NODE_PATH=$(pwd)/node_modules node api/server-simple.js",
