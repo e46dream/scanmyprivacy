@@ -1,17 +1,7 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "builder": "NIXPACKS",
-    "nixpacksPlan": {
-      "phases": {
-        "setup": {
-          "nixPkgs": ["nodejs_22", "chromium"]
-        },
-        "build": {
-          "cmds": ["npm ci", "npx playwright install chromium", "npx playwright install-deps chromium"]
-        }
-      }
-    }
+    "builder": "DOCKERFILE"
   },
   "deploy": {
     "startCommand": "node api/server-simple.js",
