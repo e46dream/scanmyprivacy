@@ -11,7 +11,7 @@
     }
   },
   "deploy": {
-    "startCommand": "pwd && ls -la && rm -rf node_modules && npm ci && ls -la node_modules | head -10 && NODE_PATH=$(pwd)/node_modules node api/server-simple.js",
+    "startCommand": "rm -rf node_modules && npm ci && npx playwright install chromium && npx playwright install-deps chromium && node api/server-simple.js",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 3
   }
