@@ -13,6 +13,7 @@
  */
 
 const { chromium } = require('playwright-chromium')
+const stealth = require('playwright-stealth')
 
 // ---------------------------------------------------------------------------
 // Tracker blocklist — subset of EasyPrivacy commonly found on small biz sites
@@ -754,6 +755,10 @@ async function runScan(targetUrl) {
 
   const startTime = Date.now()
   const browser   = await getBrowser()
+  
+  // Apply stealth plugin to avoid bot detection
+  await stealth.applyStealth(browser)
+  
   const context = await browser.newContext({
     userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     viewport:  { width: 1920, height: 1080 },
