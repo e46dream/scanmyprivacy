@@ -753,7 +753,7 @@ async function runScan(targetUrl) {
   const startTime = Date.now()
   const browser   = await getBrowser()
   const context   = await browser.newContext({
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     viewport:  { width: 1280, height: 800 },
     locale:    'en-GB',  // Triggers GDPR-targeted behaviour on many EU-aware sites
     extraHTTPHeaders: {
@@ -766,8 +766,6 @@ async function runScan(targetUrl) {
   // Set up tracker listener BEFORE navigation (captures all requests)
   const trackerCheck = checkTrackers(page)
 
-  // Set realistic user agent to avoid blocking
-  await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
   await page.setExtraHTTPHeaders({
     'Accept-Language': 'en-US,en;q=0.9',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
