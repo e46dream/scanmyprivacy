@@ -188,15 +188,30 @@ async function getBrowser() {
  * Verifies the site uses HTTPS and detects redirects
  */
 function checkHttps(originalUrl, finalUrl, redirectOccurred) {
-  const originalParsed = new URL(originalUrl)
-  const finalParsed = new URL(finalUrl)
+  let originalIsHttps = false
+  let finalIsHttps = false
+  let userEnteredHttp = false
   
-  const originalIsHttps = originalParsed.protocol === 'https:'
-  const finalIsHttps = finalParsed.protocol === 'https:'
-  
-  // If user entered http:// but got redirected to https://, that's good
-  const userEnteredHttp = originalParsed.protocol === 'http:'
-  const redirectedToHttps = userEnteredHttp && finalIsHttps && redirectOccurred
+  try {
+    const originalParsed = new URL(originalUrl)
+    const finalParsed = new URL(finalUrl)
+    
+    originalIsHttps = originalParsed.protocol === 'https:'
+    finalIsHttps = finalParsed.protocol === 'https:'
+    userEnteredHttp = originalParsed.protocol === 'http:'
+  } catch (err) {
+    console.log('Debug: URL parsing error:', err.message)
+    // If URL parsing fails, assume HTTPS is not enforced
+    return {
+      id: 'https',
+      name: 'HTTPS enforcement',
+      pass: false,
+      severity: 'critical',
+      detail: 'Could not verify HTTPS status due to URL parsing error.',
+      gdprArticle: 'GDPR Article 32 — Security of processing',
+      fix: 'Ensure the website uses valid HTTPS URLs.',
+    }
+  }
   
   console.log('Debug HTTPS check:', {
     originalUrl,
