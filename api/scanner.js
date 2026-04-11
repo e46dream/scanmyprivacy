@@ -348,10 +348,13 @@ async function checkConsentBanner(page) {
   let bannerSelector = null
   let bannerType = null
 
+  console.log('Debug: Checking for cookie banner...')
+  
   for (const selector of CMP_SIGNATURES) {
     const element = await page.$(selector)
     if (element) {
       const visible = await element.isVisible()
+      console.log(`Debug: Selector ${selector} found, visible=${visible}`)
       if (visible) {
         bannerFound   = true
         bannerSelector = selector
@@ -368,6 +371,8 @@ async function checkConsentBanner(page) {
       }
     }
   }
+  
+  console.log(`Debug: Banner detection result: found=${bannerFound}, selector=${bannerSelector}`)
 
   // Also check for common banner text patterns in page body
   if (!bannerFound) {
@@ -556,6 +561,8 @@ async function checkConsentBanner(page) {
  * Looks for a privacy policy link in header, footer, and nav.
  */
 async function checkPrivacyPolicy(page) {
+  console.log('Debug: Checking for privacy policy...')
+  
   // Check for privacy policy links in page
   const privacyLinks = await page.evaluate(() => {
     const links = Array.from(document.querySelectorAll('a'))
@@ -565,6 +572,9 @@ async function checkPrivacyPolicy(page) {
       title: link.title || ''
     }))
   })
+  
+  console.log(`Debug: Found ${privacyLinks.length} links on page`)
+  console.log('Debug: Sample links:', privacyLinks.slice(0, 10).map(l => `${l.text} -> ${l.href}`))
 
   let linkFound = false
   let linkUrl = null
@@ -580,10 +590,15 @@ async function checkPrivacyPolicy(page) {
       if (pattern.test(combinedText)) {
         linkFound = true
         linkUrl = link.href
+        console.log(`Debug: Privacy link found: ${link.text} -> ${link.href} (matched: ${pattern})`)
         break
       }
     }
     if (linkFound) break
+  }
+  
+  if (!linkFound) {
+    console.log('Debug: No privacy policy link found. Checked patterns:', PRIVACY_LINK_PATTERNS.map(p => p.toString()).slice(0, 5))
   }
 
   // Also check for privacy policy in page content
