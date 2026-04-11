@@ -168,6 +168,12 @@ async function getBrowser() {
       '--disable-setuid-sandbox',
       '--disable-dev-shm-usage',   // Prevents crashes in low-memory containers
       '--disable-gpu',
+      '--disable-blink-features=AutomationControlled',
+      '--disable-features=IsolateOrigins,site-per-process,AutomationControlled',
+      '--disable-site-isolation-trials',
+      '--disable-web-security',
+      '--disable-features=InterestCohort',  // Disable FLoC
+      '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     ],
     headless: true,
   })
