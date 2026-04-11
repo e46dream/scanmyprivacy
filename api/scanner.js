@@ -103,7 +103,9 @@ const PRIVACY_LINK_PATTERNS = [
   /cookie policy/i,
   // UK specific patterns
   /privacy[\s-_]?and[\s-_]?cookies/i,
+  /privacy[\s-_]?&[\s-_]?cookies/i,  // Privacy & cookies (ampersand)
   /cookies[\s-_]?policy/i,
+  /privacy[\s-_]?&[\s-_]?cookie[\s-_]?policy/i,  // Privacy & cookie policy
   /cookie[\s-_]?information/i,
   /cookie[\s-_]?settings/i,
   /your[\s-_]?privacy/i,
