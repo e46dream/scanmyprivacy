@@ -915,7 +915,20 @@ async function runScan(targetUrl) {
     checkForms(page),
   ])
 
-  const httpsResult = checkHttps(originalUserUrl, finalUrl, redirectOccurred)
+  console.log('Debug: About to run checks...')
+  console.log('Debug: originalUserUrl:', originalUserUrl)
+  console.log('Debug: finalUrl:', finalUrl)
+  console.log('Debug: redirectOccurred:', redirectOccurred)
+  
+  let httpsResult, cookieResult, trackerResult, consentResult, privacyResult, formResult
+  
+  try {
+    httpsResult = checkHttps(originalUserUrl, finalUrl, redirectOccurred)
+    console.log('Debug: HTTPS check passed')
+  } catch (e) {
+    console.log('Debug: HTTPS check failed:', e.message)
+    throw e
+  }
 
   await context.close()
   await browser.close()
