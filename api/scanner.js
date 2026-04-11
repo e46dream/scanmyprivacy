@@ -756,15 +756,32 @@ async function runScan(targetUrl) {
   const browser   = await getBrowser()
   const context = await browser.newContext({
     userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    viewport:  { width: 1280, height: 800 },
+    viewport:  { width: 1920, height: 1080 },
+    screen:    { width: 1920, height: 1080 },
     locale:    'en-GB',
+    timezoneId: 'Europe/London',
     bypassCSP: true,
     javaScriptEnabled: true,
+    hasTouch: false,
+    isMobile: false,
+    deviceScaleFactor: 1,
+    colorScheme: 'light',
+    reducedMotion: 'no-preference',
     extraHTTPHeaders: {
       'Accept-Language': 'en-GB,en;q=0.9',
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+      'Accept-Encoding': 'gzip, deflate, br',
+      'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
+      'DNT': '1',
+      'Connection': 'keep-alive',
+      'Cache-Control': 'max-age=0',
       'sec-ch-ua': '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
       'sec-ch-ua-mobile': '?0',
       'sec-ch-ua-platform': '"Windows"',
+      'sec-fetch-dest': 'document',
+      'sec-fetch-mode': 'navigate',
+      'sec-fetch-site': 'none',
+      'sec-fetch-user': '?1',
       'Upgrade-Insecure-Requests': '1',
     },
   })
@@ -774,9 +791,21 @@ async function runScan(targetUrl) {
   // Set up tracker listener BEFORE navigation (captures all requests)
   const trackerCheck = checkTrackers(page)
 
-  await page.setExtraHTTPHeaders({
-    'Accept-Language': 'en-US,en;q=0.9',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+  // Emulate realistic browser behavior
+  await page.setJavaScriptEnabled(true)
+  
+  // Mock webdriver property to avoid detection
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'webdriver', {
+      get: () => undefined
+    })
+    Object.defineProperty(navigator, 'plugins', {
+      get: () => [1, 2, 3, 4, 5]
+    })
+    Object.defineProperty(navigator, 'languages', {
+      get: () => ['en-GB', 'en-US', 'en']
+    })
+    window.chrome = { runtime: {} }
   })
 
   console.log('Debug: Starting scan for', originalUserUrl, 'normalized to', targetUrl)
