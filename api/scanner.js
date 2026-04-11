@@ -858,7 +858,17 @@ async function runScan(targetUrl) {
 
   try {
     // Navigate to target URL and track redirects
-    console.log('Debug: Navigating to', targetUrl)
+    console.log('Debug: Navigating to URL:', targetUrl)
+    console.log('Debug: URL type:', typeof targetUrl)
+    console.log('Debug: URL length:', targetUrl?.length)
+    
+    // Validate URL before navigation
+    try {
+      new URL(targetUrl)
+      console.log('Debug: URL is valid')
+    } catch (e) {
+      console.log('Debug: URL validation failed:', e.message)
+    }
     
     // Add random delay to appear more human-like
     await page.waitForTimeout(Math.floor(Math.random() * 1000) + 500)
