@@ -84,9 +84,9 @@ const CMP_SIGNATURES = [
   '[class*="cookie"][class*="banner"]',
   '[class*="gdpr"]',
   '[id*="gdpr"]',
-  '[data-cc*]',                  // Cookie Consent
-  '[data-consent*]',
-  '[data-cookie*]',
+  '[data-cc]',                   // Cookie Consent
+  '[data-consent]',
+  '[data-cookie]',
   
   // Text-based detection (will be checked in content)
   // These are handled in the text analysis part
@@ -752,12 +752,18 @@ async function runScan(targetUrl) {
 
   const startTime = Date.now()
   const browser   = await getBrowser()
-  const context   = await browser.newContext({
+  const context = await browser.newContext({
     userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     viewport:  { width: 1280, height: 800 },
-    locale:    'en-GB',  // Triggers GDPR-targeted behaviour on many EU-aware sites
+    locale:    'en-GB',
+    bypassCSP: true,
+    javaScriptEnabled: true,
     extraHTTPHeaders: {
       'Accept-Language': 'en-GB,en;q=0.9',
+      'sec-ch-ua': '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+      'sec-ch-ua-mobile': '?0',
+      'sec-ch-ua-platform': '"Windows"',
+      'Upgrade-Insecure-Requests': '1',
     },
   })
 
@@ -782,8 +788,11 @@ async function runScan(targetUrl) {
     // Navigate to target URL and track redirects
     console.log('Debug: Navigating to', targetUrl)
     
+    // Add random delay to appear more human-like
+    await page.waitForTimeout(Math.floor(Math.random() * 1000) + 500)
+    
     const response = await page.goto(targetUrl, { 
-      waitUntil: 'networkidle',
+      waitUntil: 'domcontentloaded',
       timeout: 30000 
     })
     
