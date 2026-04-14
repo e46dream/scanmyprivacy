@@ -879,11 +879,17 @@ async function runScan(targetUrl) {
     })
     
     // Get final URL after all redirects
-    finalUrl = page.url()
-    console.log('Debug: Final URL after navigation:', finalUrl)
+    const pageUrl = page.url()
+    console.log('Debug: Page URL after navigation:', pageUrl)
+    
+    // Only use page URL if it's valid (not about:blank or empty)
+    if (pageUrl && pageUrl.startsWith('http')) {
+      finalUrl = pageUrl
+    }
+    console.log('Debug: Final URL set to:', finalUrl)
     
     // Check if redirect occurred by comparing original and final URLs
-    if (originalUserUrl !== finalUrl) {
+    if (originalUserUrl !== finalUrl && targetUrl !== finalUrl) {
       redirectOccurred = true
       console.log('Debug: Redirect detected from', originalUserUrl, 'to', finalUrl)
     }
@@ -898,6 +904,11 @@ async function runScan(targetUrl) {
   } catch (err) {
     navigationError = err.message
     console.log('Debug: Navigation error:', err.message)
+    // Ensure finalUrl is valid even after error
+    if (!finalUrl || !finalUrl.startsWith('http')) {
+      finalUrl = targetUrl
+      console.log('Debug: Reset finalUrl to targetUrl after error:', finalUrl)
+    }
   }
 
   // Run all checks in parallel where possible
@@ -920,15 +931,7 @@ async function runScan(targetUrl) {
   console.log('Debug: finalUrl:', finalUrl)
   console.log('Debug: redirectOccurred:', redirectOccurred)
   
-  let httpsResult, cookieResult, trackerResult, consentResult, privacyResult, formResult
-  
-  try {
-    httpsResult = checkHttps(originalUserUrl, finalUrl, redirectOccurred)
-    console.log('Debug: HTTPS check passed')
-  } catch (e) {
-    console.log('Debug: HTTPS check failed:', e.message)
-    throw e
-  }
+  const httpsResult = checkHttps(originalUserUrl, finalUrl, redirectOccurred)
 
   await context.close()
   await browser.close()
