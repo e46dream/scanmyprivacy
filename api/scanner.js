@@ -911,6 +911,51 @@ async function runScan(targetUrl) {
     }
   }
 
+  console.log('Debug: About to run checks...')
+  console.log('Debug: originalUserUrl:', originalUserUrl)
+  console.log('Debug: finalUrl:', finalUrl)
+  console.log('Debug: redirectOccurred:', redirectOccurred)
+  console.log('Debug: navigationError:', navigationError)
+  
+  // If navigation failed, return early with error result
+  if (navigationError) {
+    await context.close()
+    await browser.close()
+    
+    return {
+      meta: {
+        url: finalUrl,
+        originalUrl: originalUserUrl,
+        redirectOccurred,
+        scannedAt: new Date().toISOString(),
+        durationMs: Date.now() - startTime,
+        scannerVersion:'1.0.0',
+        navigationError,
+      },
+      scoring: {
+        score: 0,
+        grade: 'F',
+        totalChecks: 6,
+        criticalCount: 6,
+        warningCount: 0,
+        passedCount: 0,
+      },
+      checks: [
+        { id: 'https', name: 'HTTPS check', pass: false, severity: 'critical', detail: 'Could not verify due to navigation error: ' + navigationError },
+        { id: 'cookies', name: 'Cookie audit', pass: false, severity: 'critical', detail: 'Could not check due to navigation error: ' + navigationError },
+        { id: 'trackers', name: 'Tracker detection', pass: false, severity: 'critical', detail: 'Could not check due to navigation error: ' + navigationError },
+        { id: 'consent', name: 'Consent banner', pass: false, severity: 'critical', detail: 'Could not check due to navigation error: ' + navigationError },
+        { id: 'privacy', name: 'Privacy policy', pass: false, severity: 'critical', detail: 'Could not check due to navigation error: ' + navigationError },
+        { id: 'forms', name: 'Form security', pass: false, severity: 'critical', detail: 'Could not check due to navigation error: ' + navigationError },
+      ],
+      criticalIssues: [],
+      warnings: [],
+      passed: [],
+      cookieTable: [],
+      trackerList: [],
+    }
+  }
+  
   // Run all checks in parallel where possible
   const [
     cookieResult,
@@ -926,11 +971,6 @@ async function runScan(targetUrl) {
     checkForms(page),
   ])
 
-  console.log('Debug: About to run checks...')
-  console.log('Debug: originalUserUrl:', originalUserUrl)
-  console.log('Debug: finalUrl:', finalUrl)
-  console.log('Debug: redirectOccurred:', redirectOccurred)
-  
   const httpsResult = checkHttps(originalUserUrl, finalUrl, redirectOccurred)
 
   await context.close()
