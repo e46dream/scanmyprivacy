@@ -19,6 +19,41 @@ const StealthPlugin = require('puppeteer-extra-plugin-stealth')
 chromium.use(StealthPlugin())
 
 // ---------------------------------------------------------------------------
+// Scraping API Fallback — for sites that block Playwright
+// Uses ScrapingBee or similar service when bot detection is too strong
+// ---------------------------------------------------------------------------
+async function fetchWithScrapingAPI(url) {
+  const apiKey = process.env.SCRAPINGBEE_API_KEY
+  if (!apiKey) {
+    console.log('ScrapingAPI: No API key configured')
+    return null
+  }
+
+  try {
+    const apiUrl = `https://app.scrapingbee.com/api/v1?api_key=${apiKey}&url=${encodeURIComponent(url)}&render_js=true&stealth_proxy=true`
+    console.log('ScrapingAPI: Trying fallback for', url)
+    
+    const response = await fetch(apiUrl, { timeout: 60000 })
+    if (!response.ok) {
+      throw new Error(`ScrapingAPI returned ${response.status}`)
+    }
+    
+    const html = await response.text()
+    console.log('ScrapingAPI: Success, fetched', html.length, 'bytes')
+    
+    return {
+      success: true,
+      html,
+      finalUrl: url,
+      method: 'scraping_api'
+    }
+  } catch (err) {
+    console.log('ScrapingAPI: Failed:', err.message)
+    return null
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Tracker blocklist — subset of EasyPrivacy commonly found on small biz sites
 // Extend this list as needed. Full EasyPrivacy list can be loaded from URL.
 // ---------------------------------------------------------------------------
@@ -244,6 +279,9 @@ function checkHttps(originalUrl, finalUrl, redirectOccurred) {
     }
   }
   
+  // Determine if user was redirected from HTTP to HTTPS
+  const redirectedToHttps = userEnteredHttp && finalIsHttps
+  
   console.log('Debug HTTPS check:', {
     originalUrl,
     finalUrl,
@@ -255,7 +293,7 @@ function checkHttps(originalUrl, finalUrl, redirectOccurred) {
   })
   
   // Pass if final URL is HTTPS, or if user entered HTTP and got redirected to HTTPS
-  const isSecure = finalIsHttps || redirectedToHttps
+  const isSecure = finalIsHttps
 
   return {
     id: 'https',
@@ -942,7 +980,21 @@ async function runScan(targetUrl) {
   console.log('Debug: redirectOccurred:', redirectOccurred)
   console.log('Debug: navigationError:', navigationError)
   
-  // If navigation failed, return early with error result
+  // If navigation failed, try scraping API fallback
+  let scrapingFallback = null
+  if (navigationError && navigationError.includes('403')) {
+    console.log('Debug: Trying scraping API fallback due to 403 error')
+    scrapingFallback = await fetchWithScrapingAPI(targetUrl)
+    
+    if (scrapingFallback?.success) {
+      console.log('Debug: Scraping API succeeded, using fallback content')
+      navigationError = null
+      // Set content for analysis
+      await page.setContent(scrapingFallback.html, { waitUntil: 'domcontentloaded' })
+    }
+  }
+  
+  // If navigation failed and no fallback, return early with error result
   if (navigationError) {
     await context.close()
     await browser.close()
