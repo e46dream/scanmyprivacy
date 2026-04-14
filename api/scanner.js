@@ -828,9 +828,6 @@ async function runScan(targetUrl) {
   // Set up tracker listener BEFORE navigation (captures all requests)
   const trackerCheck = checkTrackers(page)
 
-  // Emulate realistic browser behavior
-  await page.setJavaScriptEnabled(true)
-  
   // Mock webdriver property to avoid detection
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'webdriver', {
