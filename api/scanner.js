@@ -12,7 +12,11 @@
  *   const results = await runScan('https://acmeshop.com')
  */
 
-const { chromium } = require('playwright-chromium')
+const { chromium } = require('playwright-extra')
+const StealthPlugin = require('puppeteer-extra-plugin-stealth')
+
+// Enable stealth plugin
+chromium.use(StealthPlugin())
 
 // ---------------------------------------------------------------------------
 // Tracker blocklist — subset of EasyPrivacy commonly found on small biz sites
@@ -160,22 +164,50 @@ async function getBrowser() {
     )
   }
 
-  // Fallback: local Chromium (Railway self-hosted)
-  return await chromium.launch({
+  // Build launch options with enhanced stealth
+  const launchOptions = {
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',   // Prevents crashes in low-memory containers
+      '--disable-dev-shm-usage',
       '--disable-gpu',
       '--disable-blink-features=AutomationControlled',
       '--disable-features=IsolateOrigins,site-per-process,AutomationControlled',
       '--disable-site-isolation-trials',
       '--disable-web-security',
-      '--disable-features=InterestCohort',  // Disable FLoC
-      '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      '--disable-features=InterestCohort',
+      // Additional anti-detection args
+      '--disable-blink-features=AutomationControlled',
+      '--disable-automation',
+      '--disable-software-rasterizer',
+      '--disable-background-networking',
+      '--disable-background-timer-throttling',
+      '--disable-renderer-backgrounding',
+      '--disable-features=TranslateUI',
+      '--disable-component-extensions-with-background-pages',
+      '--window-size=1920,1080',
+      '--start-maximized',
+      '--force-color-profile=srgb',
+      '--force-device-scale-factor=1',
+      '--hide-scrollbars',
+      '--metrics-recording-only',
+      '--no-first-run',
+      '--safebrowsing-disable-auto-update',
+      '--password-store=basic',
+      '--use-mock-keychain',
     ],
     headless: true,
-  })
+  }
+
+  // Add proxy if configured (residential proxy for bot evasion)
+  const proxyUrl = process.env.PROXY_URL
+  if (proxyUrl) {
+    console.log('Using proxy:', proxyUrl.replace(/:\/\/.*@/, '://***@')) // Hide credentials in logs
+    launchOptions.proxy = { server: proxyUrl }
+  }
+
+  // Fallback: local Chromium (Railway self-hosted)
+  return await chromium.launch(launchOptions)
 }
 
 // ---------------------------------------------------------------------------
