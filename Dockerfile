@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/playwright:v1.49.1-jammy
 WORKDIR /app
 
 # Cache bust to force fresh build
-ARG CACHE_BUST=2
+ARG CACHE_BUST=3
 
 COPY package*.json ./
 RUN npm ci
