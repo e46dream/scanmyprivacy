@@ -46,7 +46,14 @@ const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET
 // ---------------------------------------------------------------------------
 // Health check
 // ---------------------------------------------------------------------------
-app.get('/health', (req, res) => res.json({ ok: true }))
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    version: '1.0.1',
+    build: '2025-04-14-v2'
+  })
+})
 
 // ---------------------------------------------------------------------------
 // Stripe webhook
@@ -114,22 +121,33 @@ app.use(express.json())
 
 // ---------------------------------------------------------------------------
 // Free scan endpoint (for frontend)
+// Supports both GET (query params) and POST (JSON body)
 // ---------------------------------------------------------------------------
-app.get('/scan', async (req, res) => {
-  const { url } = req.query
+async function handleScan(req, res) {
+  const url = req.query.url || req.body?.url
   
   if (!url) {
-    return res.status(400).json({ error: 'URL is required' })
+    return res.status(400).json({
+      error: 'URL is required',
+      code: 'MISSING_URL'
+    })
   }
 
   try {
     const results = await runScan(url)
-    res.json(results)
+    res.json({ success: true, data: results })
   } catch (err) {
     console.error('Scan error:', err)
-    res.status(500).json({ error: 'Scan failed', message: err.message })
+    res.status(500).json({
+      error: 'Scan failed',
+      message: err.message,
+      code: 'SCAN_ERROR'
+    })
   }
-})
+}
+
+app.get('/scan', handleScan)
+app.post('/scan', handleScan)
 
 // ---------------------------------------------------------------------------
 // Create Stripe checkout session (for frontend)

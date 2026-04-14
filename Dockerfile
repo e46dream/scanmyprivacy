@@ -14,4 +14,4 @@ COPY . .
 
 EXPOSE 8080
 
-CMD ["node", "api/server-simple.js"]
+CMD ["node", "api/server.js"]
