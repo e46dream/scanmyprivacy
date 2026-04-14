@@ -7,7 +7,7 @@ ARG BUILD_DATE=2025-04-14-v5
 RUN echo "Build: $BUILD_DATE"
 
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 # Force fresh copy of all files
 COPY . .
