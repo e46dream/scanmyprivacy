@@ -26,6 +26,21 @@ export default function AboutPage() {
             <li>Form security</li>
           </ul>
           
+          <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">Personal Privacy Scan</h2>
+          <p className="text-gray-600 mb-4">
+            In addition to website scanning, we offer free tools to check your own privacy and security:
+          </p>
+          <ul className="list-disc pl-6 mb-6 space-y-2 text-gray-600">
+            <li><strong>IP Leak Test:</strong> Check if your real IP address is exposed</li>
+            <li><strong>Browser Fingerprint:</strong> See how trackable your browser is</li>
+            <li><strong>DNS Leak Check:</strong> Verify your DNS requests are secure</li>
+            <li><strong>WebRTC Test:</strong> Detect potential IP leaks through WebRTC</li>
+          </ul>
+          <p className="text-gray-600 mb-6">
+            These tools help individuals understand their digital footprint and take steps to 
+            protect their online privacy.
+          </p>
+
           <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">How It Works</h2>
           <p className="text-gray-600 mb-6">
             Enter any website URL and our scanner will analyze it using a headless browser. 
